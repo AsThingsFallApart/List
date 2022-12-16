@@ -1,0 +1,16 @@
+.instantiation {
+  display: flex;
+  background-color: lavender;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 2%;
+  size: 10%;
+}
+
+.creator {
+  background-color: azure;
+}
+
+.list {
+  background-color: thistle;
+}
