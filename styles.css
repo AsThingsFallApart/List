@@ -1,3 +1,7 @@
+.body {
+  background-color: gainsboro;
+}
+
 .instantiation {
   display: flex;
   background-color: lavender;
@@ -17,23 +21,23 @@
 
 .tableList {
   width: 100%;
+  border: 1px solid #333;
 }
 
 .tableListRow {
   border: 1px solid #333;
-  height: 2em;
+  height: 2.5em;
   display: flex;
   justify-content: center;
 }
 
 .tableListRowIndicator {
-  border: 1px solid #333;
+  border-right: 1px solid #333;
   width: 20%;
   background-color: crimson;
 }
 
 .tableListRowDescriptor {
-  border: 1px solid #333;
   width: 80%;
   display: flex;
   align-items: center;
