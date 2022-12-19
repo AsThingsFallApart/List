@@ -1,5 +1,5 @@
 let rowCreator = document.getElementById('creator');
-rowCreator.addEventListener('click', createRow);
+rowCreator.addEventListener('click', handleRowCreation);
 
 function handleIndicatorClick(event) {
   if (event.target.classList == 'tableListRowIndicatorWaitlist') {
@@ -9,8 +9,20 @@ function handleIndicatorClick(event) {
   }
 }
 
-function createRow() {
-  let list = document.getElementById('tableList');
+function handleRowCreation() {
+  let list;
+
+  if (document.getElementById('tableList') == undefined) {
+    list = document.createElement('table');
+    list.id = 'tableList';
+    list.classList = 'tableList';
+
+    let listArea = document.getElementsByClassName('list')[0];
+    listArea.appendChild(list);
+  } else {
+    list = document.getElementById('tableList');
+  }
+
   let inputText = document.getElementById('inputBox').value;
 
   let listRowIndicator = document.createElement('td');
