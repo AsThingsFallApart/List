@@ -1,23 +1,6 @@
 let rowCreator = document.getElementById('creator');
 rowCreator.addEventListener('click', createRow);
 
-let rowIndicatorsWaitlist = document.getElementsByClassName(
-  'tableListRowIndicatorWaitlist'
-);
-for (let i = 0; i < rowIndicatorsWaitlist.length; i++) {
-  rowIndicatorsWaitlist[i].addEventListener('click', handleIndicatorClick);
-}
-
-let rowIndicatorsOpen = document.getElementsByClassName(
-  'tableListRowIndicatorOpen'
-);
-for (let i = 0; i < rowIndicatorsOpen.length; i++) {
-  rowIndicatorsOpen[i].addEventListener('click', handleIndicatorClick);
-}
-
-console.log(rowIndicatorsWaitlist);
-console.log(rowIndicatorsOpen);
-
 function handleIndicatorClick(event) {
   if (event.target.classList == 'tableListRowIndicatorWaitlist') {
     event.target.classList = 'tableListRowIndicatorOpen';
@@ -32,6 +15,7 @@ function createRow() {
 
   let listRowIndicator = document.createElement('td');
   listRowIndicator.classList.add('tableListRowIndicatorWaitlist');
+  listRowIndicator.addEventListener('click', handleIndicatorClick);
 
   let listRowDescriptor = document.createElement('td');
   listRowDescriptor.classList.add('tableListRowDescriptor');
