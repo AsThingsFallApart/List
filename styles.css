@@ -15,7 +15,7 @@
 }
 
 .list {
-  background-color: lavenderblush;
+  background-color: white;
   margin: 3%;
 }
 
@@ -31,10 +31,16 @@
   justify-content: center;
 }
 
-.tableListRowIndicator {
+.tableListRowIndicatorWaitlist {
+  background-color: crimson;
   border-right: 1px solid #333;
   width: 20%;
-  background-color: crimson;
+}
+
+.tableListRowIndicatorOpen {
+  background-color: green;
+  border-right: 1px solid #333;
+  width: 20%;
 }
 
 .tableListRowDescriptor {
