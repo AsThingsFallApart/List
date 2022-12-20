@@ -4,6 +4,37 @@ rowCreator.addEventListener('click', handleRowCreation);
 let rowTextInputBox = document.getElementById('inputBox');
 rowTextInputBox.addEventListener('keydown', createRowOnEnter);
 
+function handleTextSubstitution(event) {
+  let currentText = event.target.textContent;
+  let currentTableListRowDescriptor = event.target;
+
+  let inputSubtitutor = document.createElement('input');
+  inputSubtitutor.value = currentText;
+  inputSubtitutor.classList = 'tableListRowDescriptorSubstitution';
+  inputSubtitutor.addEventListener('keydown', substituteBack);
+
+  let parentTableRowList = currentTableListRowDescriptor.parentNode;
+  parentTableRowList.replaceChild(
+    inputSubtitutor,
+    currentTableListRowDescriptor
+  );
+}
+
+function substituteBack(event) {
+  if (event.key == 'Enter') {
+    let newTableListRowDescriptor = document.createElement('td');
+    newTableListRowDescriptor.classList = 'tableListRowDescriptor';
+    newTableListRowDescriptor.textContent = event.target.value;
+    newTableListRowDescriptor.addEventListener(
+      'dblclick',
+      handleTextSubstitution
+    );
+
+    let parentTableListRow = event.target.parentNode;
+    parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+  }
+}
+
 function createRowOnEnter(event) {
   if (event.key == 'Enter') {
     handleRowCreation();
@@ -41,6 +72,7 @@ function handleRowCreation() {
   let listRowDescriptor = document.createElement('td');
   listRowDescriptor.classList.add('tableListRowDescriptor');
   listRowDescriptor.textContent = inputText;
+  listRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
 
   let newListRow = document.createElement('tr');
   newListRow.classList.add('tableListRow');
