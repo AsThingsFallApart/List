@@ -1,6 +1,15 @@
 let rowCreator = document.getElementById('creator');
 rowCreator.addEventListener('click', handleRowCreation);
 
+let rowTextInputBox = document.getElementById('inputBox');
+rowTextInputBox.addEventListener('keydown', createRowOnEnter);
+
+function createRowOnEnter(event) {
+  if (event.key == 'Enter') {
+    handleRowCreation();
+  }
+}
+
 function handleIndicatorClick(event) {
   if (event.target.classList == 'tableListRowIndicatorWaitlist') {
     event.target.classList = 'tableListRowIndicatorOpen';
