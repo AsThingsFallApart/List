@@ -31,7 +31,7 @@
   justify-content: center;
 }
 
-.tableListRowIndicatorWaitlist {
+.tableListRowIndicatorClosed {
   background-color: crimson;
   border-right: 1px solid #333;
   width: 20%;

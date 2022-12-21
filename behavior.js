@@ -11,16 +11,41 @@ function handleTextSubstitution(event) {
   let inputSubtitutor = document.createElement('input');
   inputSubtitutor.value = currentText;
   inputSubtitutor.classList = 'tableListRowDescriptorSubstitution';
-  inputSubtitutor.addEventListener('keydown', substituteBack);
+  inputSubtitutor.addEventListener('keydown', substituteBackOnKeydown);
+  inputSubtitutor.addEventListener('blur', substituteBackOnBlur);
 
-  let parentTableRowList = currentTableListRowDescriptor.parentNode;
-  parentTableRowList.replaceChild(
+  let parentTableListRow = currentTableListRowDescriptor.parentNode;
+  parentTableListRow.replaceChild(
     inputSubtitutor,
     currentTableListRowDescriptor
   );
 }
 
-function substituteBack(event) {
+function substituteBackOnBlur(event) {
+  console.log(event);
+  console.log(event.target);
+  console.log(event.target.parentNode);
+  console.log(
+    event.target.parentNode.childNodes[1].classList ==
+      'tableListRowDescriptorSubstitution'
+  );
+  let newTableListRowDescriptor = document.createElement('td');
+  newTableListRowDescriptor.classList = 'tableListRowDescriptor';
+  newTableListRowDescriptor.textContent = event.target.value;
+  newTableListRowDescriptor.addEventListener(
+    'dblclick',
+    handleTextSubstitution
+  );
+
+  let parentTableListRow = event.target.parentNode;
+  parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+}
+
+function substituteBackOnKeydown(event) {
+  console.log(event.target);
+  console.log(event.target.parentNode.childNodes);
+  console.log(event);
+  console.log(event.type);
   if (event.key == 'Enter') {
     let newTableListRowDescriptor = document.createElement('td');
     newTableListRowDescriptor.classList = 'tableListRowDescriptor';
@@ -29,6 +54,21 @@ function substituteBack(event) {
       'dblclick',
       handleTextSubstitution
     );
+
+    event.target.removeEventListener('blur', substituteBackOnBlur);
+
+    let parentTableListRow = event.target.parentNode;
+    parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+  } else if (event.key == 'Escape') {
+    let newTableListRowDescriptor = document.createElement('td');
+    newTableListRowDescriptor.classList = 'tableListRowDescriptor';
+    newTableListRowDescriptor.textContent = event.target.value;
+    newTableListRowDescriptor.addEventListener(
+      'dblclick',
+      handleTextSubstitution
+    );
+
+    event.target.removeEventListener('blur', substituteBackOnBlur);
 
     let parentTableListRow = event.target.parentNode;
     parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
@@ -42,10 +82,10 @@ function createRowOnEnter(event) {
 }
 
 function handleIndicatorClick(event) {
-  if (event.target.classList == 'tableListRowIndicatorWaitlist') {
+  if (event.target.classList == 'tableListRowIndicatorClosed') {
     event.target.classList = 'tableListRowIndicatorOpen';
   } else if (event.target.classList == 'tableListRowIndicatorOpen') {
-    event.target.classList = 'tableListRowIndicatorWaitlist';
+    event.target.classList = 'tableListRowIndicatorClosed';
   }
 }
 
@@ -66,7 +106,7 @@ function handleRowCreation() {
   let inputText = document.getElementById('inputBox').value;
 
   let listRowIndicator = document.createElement('td');
-  listRowIndicator.classList.add('tableListRowIndicatorWaitlist');
+  listRowIndicator.classList.add('tableListRowIndicatorClosed');
   listRowIndicator.addEventListener('click', handleIndicatorClick);
 
   let listRowDescriptor = document.createElement('td');
