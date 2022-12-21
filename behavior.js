@@ -13,6 +13,8 @@ function handleTextSubstitution(event) {
   inputSubtitutor.classList = 'tableListRowDescriptorSubstitution';
   inputSubtitutor.addEventListener('keydown', substituteBackOnKeydown);
   inputSubtitutor.addEventListener('blur', substituteBackOnBlur);
+  inputSubtitutor.addEventListener('keydown', handleRowDeletion);
+  inputSubtitutor.addEventListener('blur', handleRowDeletion);
 
   let parentTableListRow = currentTableListRowDescriptor.parentNode;
   parentTableListRow.replaceChild(
@@ -21,32 +23,71 @@ function handleTextSubstitution(event) {
   );
 }
 
-function substituteBackOnBlur(event) {
-  console.log(event);
-  console.log(event.target);
-  console.log(event.target.parentNode);
+function handleRowDeletion(event) {
+  let tableListRowSubstitutorContent = event.target.value;
+  console.log(`Element with raised event: ${event.target}`);
   console.log(
-    event.target.parentNode.childNodes[1].classList ==
-      'tableListRowDescriptorSubstitution'
+    `Element with raised event's content: ${tableListRowSubstitutorContent}`
   );
-  let newTableListRowDescriptor = document.createElement('td');
-  newTableListRowDescriptor.classList = 'tableListRowDescriptor';
-  newTableListRowDescriptor.textContent = event.target.value;
-  newTableListRowDescriptor.addEventListener(
-    'dblclick',
-    handleTextSubstitution
-  );
+  console.log(`Event type: ${event.type}`);
+  // console.log(`Element with rasied event's parent: ${event.target.parentNode}`);
+  // console.log(
+  //   `Element with raised event's parent's parent: ${event.target.parentNode.parentNode}`
+  // );
 
-  let parentTableListRow = event.target.parentNode;
-  parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+  if (event.key == 'Enter' && tableListRowSubstitutorContent == '') {
+    event.target.removeEventListener('blur', handleRowDeletion);
+
+    let tableListRow = event.target.parentNode;
+    let tableList = event.target.parentNode.parentNode;
+
+    tableList.removeChild(tableListRow);
+
+    if (tableList.childNodes.length == 0) {
+      tableList.parentNode.removeChild(tableList);
+    }
+  } else if (event.key == 'Escape' && tableListRowSubstitutorContent == '') {
+    event.target.removeEventListener('blur', handleRowDeletion);
+
+    let tableListRow = event.target.parentNode;
+    let tableList = event.target.parentNode.parentNode;
+
+    tableList.removeChild(tableListRow);
+
+    if (tableList.childNodes.length == 0) {
+      tableList.parentNode.removeChild(tableList);
+    }
+  } else if (event.type == 'blur' && tableListRowSubstitutorContent == '') {
+    let tableListRow = event.target.parentNode;
+    let tableList = event.target.parentNode.parentNode;
+
+    tableList.removeChild(tableListRow);
+
+    if (tableList.childNodes.length == 0) {
+      tableList.parentNode.removeChild(tableList);
+    }
+  }
+}
+
+function substituteBackOnBlur(event) {
+  if (event.target.value != '') {
+    let newTableListRowDescriptor = document.createElement('td');
+    newTableListRowDescriptor.classList = 'tableListRowDescriptor';
+    newTableListRowDescriptor.textContent = event.target.value;
+    newTableListRowDescriptor.addEventListener(
+      'dblclick',
+      handleTextSubstitution
+    );
+
+    let parentTableListRow = event.target.parentNode;
+    parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+  }
 }
 
 function substituteBackOnKeydown(event) {
-  console.log(event.target);
-  console.log(event.target.parentNode.childNodes);
-  console.log(event);
-  console.log(event.type);
-  if (event.key == 'Enter') {
+  let inputSubtitutorValue = event.target.value;
+
+  if (event.key == 'Enter' && inputSubtitutorValue != '') {
     let newTableListRowDescriptor = document.createElement('td');
     newTableListRowDescriptor.classList = 'tableListRowDescriptor';
     newTableListRowDescriptor.textContent = event.target.value;
@@ -59,7 +100,7 @@ function substituteBackOnKeydown(event) {
 
     let parentTableListRow = event.target.parentNode;
     parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
-  } else if (event.key == 'Escape') {
+  } else if (event.key == 'Escape' && inputSubtitutorValue != '') {
     let newTableListRowDescriptor = document.createElement('td');
     newTableListRowDescriptor.classList = 'tableListRowDescriptor';
     newTableListRowDescriptor.textContent = event.target.value;
