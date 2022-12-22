@@ -4,6 +4,10 @@ rowCreator.addEventListener('click', handleRowCreation);
 let rowTextInputBox = document.getElementById('inputBox');
 rowTextInputBox.addEventListener('keydown', createRowOnEnter);
 
+function handleDrag(event) {
+  event.dataTransfer.setData('application/x-moz-node', event.target);
+}
+
 function handleTextSubstitution(event) {
   let currentText = event.target.textContent;
   let currentTableListRowDescriptor = event.target;
@@ -25,15 +29,6 @@ function handleTextSubstitution(event) {
 
 function handleRowDeletion(event) {
   let tableListRowSubstitutorContent = event.target.value;
-  console.log(`Element with raised event: ${event.target}`);
-  console.log(
-    `Element with raised event's content: ${tableListRowSubstitutorContent}`
-  );
-  console.log(`Event type: ${event.type}`);
-  // console.log(`Element with rasied event's parent: ${event.target.parentNode}`);
-  // console.log(
-  //   `Element with raised event's parent's parent: ${event.target.parentNode.parentNode}`
-  // );
 
   if (event.key == 'Enter' && tableListRowSubstitutorContent == '') {
     event.target.removeEventListener('blur', handleRowDeletion);
@@ -159,6 +154,8 @@ function handleRowCreation() {
   newListRow.classList.add('tableListRow');
   newListRow.appendChild(listRowIndicator);
   newListRow.appendChild(listRowDescriptor);
+  newListRow.draggable = true;
+  newListRow.addEventListener('dragstart', handleDrag);
 
   list.appendChild(newListRow);
 }
