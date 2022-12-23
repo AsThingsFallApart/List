@@ -1,11 +1,53 @@
+const crimson = 'rgb(220, 20, 60)';
+const forestgreen = 'rgb(34, 139, 34)';
+
+let defaultColor = crimson;
+
 let rowCreator = document.getElementById('creator');
 rowCreator.addEventListener('click', handleRowCreation);
 
 let rowTextInputBox = document.getElementById('inputBox');
-rowTextInputBox.addEventListener('keydown', createRowOnEnter);
+rowTextInputBox.addEventListener('keydown', createRowOnKeydown);
 
-function handleDrag(event) {
-  event.dataTransfer.setData('application/x-moz-node', event.target);
+function handleDrop(event) {
+  event.preventDefault();
+  console.log('dropped');
+  console.log(`event target: ${event.target}`);
+  console.log(
+    `event.dataTransfer.data: ${event.dataTransfer.getData(
+      'application/x-moz-node'
+    )}`
+  );
+  let tableList = document.getElementById('tableList');
+  console.log(`tableList Element: ${tableList}`);
+  console.log(`tableList class: ${tableList.classList}`);
+  console.log(`event.target class: ${event.target.classList}`);
+
+  if (event.target.classList == 'tableList') {
+    let draggedRowData = event.dataTransfer.getData('application/x-moz-node');
+    console.log(`draggedRowData: ${draggedRowData}`);
+    console.log(draggedRowData);
+    let draggedRow = document.createElement('tr');
+    draggedRow.innerHTML = draggedRowData;
+    draggedRow.console.log(
+      `I should be a row element in the DOM: ${draggedRow}`
+    );
+
+    tableList.appendChild(draggedRow);
+  }
+}
+
+function handleDragStart(event) {
+  console.log(
+    `Is ${event.target.parentNode} a Node: ${
+      event.target.parentNode instanceof Node
+    }`
+  );
+  console.log(event.target.parentNode);
+  event.dataTransfer.setData(
+    'application/x-moz-node',
+    event.target.parentNode.innerHTML
+  );
 }
 
 function handleTextSubstitution(event) {
@@ -111,18 +153,57 @@ function substituteBackOnKeydown(event) {
   }
 }
 
-function createRowOnEnter(event) {
+function createRowOnKeydown(event) {
   if (event.key == 'Enter') {
     handleRowCreation();
   }
 }
 
 function handleIndicatorClick(event) {
-  if (event.target.classList == 'tableListRowIndicatorClosed') {
-    event.target.classList = 'tableListRowIndicatorOpen';
-  } else if (event.target.classList == 'tableListRowIndicatorOpen') {
-    event.target.classList = 'tableListRowIndicatorClosed';
+  let tableListRowIndicator = event.target;
+
+  if (tableListRowIndicator.style.backgroundColor == crimson) {
+    tableListRowIndicator.style.backgroundColor = forestgreen;
+  } else if (tableListRowIndicator.style.backgroundColor == forestgreen) {
+    tableListRowIndicator.style.backgroundColor = crimson;
   }
+}
+
+function addBehaviorAndStyleToRowChildren(HTMLTableListRow) {
+  console.log(HTMLTableListRow.childNodes);
+
+  let rowColumns = HTMLTableListRow.childNodes;
+
+  for (let i = 0; i < rowColumns.length; i++) {
+    if (rowColumns[i].classList == 'tableListRowIndicator') {
+      rowColumns[i].addEventListener('click', handleIndicatorClick);
+      rowColumns[i].draggable = true;
+      rowColumns[i].addEventListener('dragstart', handleDragStart);
+      rowColumns[i].style.backgroundColor = defaultColor;
+    } else if (rowColumns[i].classList == 'tableListRowDescriptor') {
+      let inputText = document.getElementById('inputBox').value;
+
+      rowColumns[i].textContent = inputText;
+      rowColumns[i].addEventListener('dblclick', handleTextSubstitution);
+    }
+  }
+}
+
+function createTableListRow() {
+  let listRowIndicator = document.createElement('td');
+  listRowIndicator.classList.add('tableListRowIndicator');
+
+  let listRowDescriptor = document.createElement('td');
+  listRowDescriptor.classList.add('tableListRowDescriptor');
+
+  let newListRow = document.createElement('tr');
+  newListRow.classList.add('tableListRow');
+  newListRow.appendChild(listRowIndicator);
+  newListRow.appendChild(listRowDescriptor);
+
+  addBehaviorAndStyleToRowChildren(newListRow);
+
+  return newListRow;
 }
 
 function handleRowCreation() {
@@ -132,6 +213,17 @@ function handleRowCreation() {
     list = document.createElement('table');
     list.id = 'tableList';
     list.classList = 'tableList';
+    list.addEventListener('dragenter', (event) => {
+      event.preventDefault();
+      console.log('entering drag area');
+      console.log(`event target: ${event.target}`);
+    });
+    list.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      console.log('entering drag area again');
+      console.log(`event.dataTransfer.types: ${event.dataTransfer.types}`);
+    });
+    list.addEventListener('drop', handleDrop);
 
     let listArea = document.getElementsByClassName('list')[0];
     listArea.appendChild(list);
@@ -139,23 +231,7 @@ function handleRowCreation() {
     list = document.getElementById('tableList');
   }
 
-  let inputText = document.getElementById('inputBox').value;
-
-  let listRowIndicator = document.createElement('td');
-  listRowIndicator.classList.add('tableListRowIndicatorClosed');
-  listRowIndicator.addEventListener('click', handleIndicatorClick);
-
-  let listRowDescriptor = document.createElement('td');
-  listRowDescriptor.classList.add('tableListRowDescriptor');
-  listRowDescriptor.textContent = inputText;
-  listRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
-
-  let newListRow = document.createElement('tr');
-  newListRow.classList.add('tableListRow');
-  newListRow.appendChild(listRowIndicator);
-  newListRow.appendChild(listRowDescriptor);
-  newListRow.draggable = true;
-  newListRow.addEventListener('dragstart', handleDrag);
+  let newListRow = createTableListRow();
 
   list.appendChild(newListRow);
 }
