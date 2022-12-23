@@ -48,6 +48,7 @@ function handleDragStart(event) {
     'application/x-moz-node',
     event.target.parentNode.innerHTML
   );
+  event.dataTransfer.setDragImage(event.target.parentNode, 0, 0);
 }
 
 function handleTextSubstitution(event) {
@@ -215,11 +216,13 @@ function handleRowCreation() {
       event.preventDefault();
       console.log('entering drag area');
       console.log(`event target: ${event.target}`);
+      event.dataTransfer.dropEffect = 'move';
     });
     list.addEventListener('dragover', (event) => {
       event.preventDefault();
       console.log('entering drag area again');
       console.log(`event.dataTransfer.types: ${event.dataTransfer.types}`);
+      event.dataTransfer.dropEffect = 'move';
     });
     list.addEventListener('drop', handleDrop);
 
