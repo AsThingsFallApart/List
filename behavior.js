@@ -26,12 +26,12 @@ function handleDrop(event) {
   if (event.target.classList == 'tableList') {
     let draggedRowData = event.dataTransfer.getData('application/x-moz-node');
     console.log(`draggedRowData: ${draggedRowData}`);
-    console.log(draggedRowData);
     let draggedRow = document.createElement('tr');
     draggedRow.innerHTML = draggedRowData;
-    draggedRow.console.log(
-      `I should be a row element in the DOM: ${draggedRow}`
-    );
+    draggedRow.classList = 'tableListRow';
+    console.log(`draggedRow.innerHTML: ${draggedRow.innerHTML}`);
+    addBehaviorToRowChildren(draggedRow);
+    console.log(draggedRow);
 
     tableList.appendChild(draggedRow);
   }
@@ -169,7 +169,7 @@ function handleIndicatorClick(event) {
   }
 }
 
-function addBehaviorAndStyleToRowChildren(HTMLTableListRow) {
+function addBehaviorToRowChildren(HTMLTableListRow) {
   console.log(HTMLTableListRow.childNodes);
 
   let rowColumns = HTMLTableListRow.childNodes;
@@ -179,29 +179,27 @@ function addBehaviorAndStyleToRowChildren(HTMLTableListRow) {
       rowColumns[i].addEventListener('click', handleIndicatorClick);
       rowColumns[i].draggable = true;
       rowColumns[i].addEventListener('dragstart', handleDragStart);
-      rowColumns[i].style.backgroundColor = defaultColor;
     } else if (rowColumns[i].classList == 'tableListRowDescriptor') {
-      let inputText = document.getElementById('inputBox').value;
-
-      rowColumns[i].textContent = inputText;
       rowColumns[i].addEventListener('dblclick', handleTextSubstitution);
     }
   }
 }
 
-function createTableListRow() {
+function initTableListRow() {
   let listRowIndicator = document.createElement('td');
   listRowIndicator.classList.add('tableListRowIndicator');
+  listRowIndicator.style.backgroundColor = defaultColor;
 
   let listRowDescriptor = document.createElement('td');
   listRowDescriptor.classList.add('tableListRowDescriptor');
+  listRowDescriptor.textContent = document.getElementById('inputBox').value;
 
   let newListRow = document.createElement('tr');
   newListRow.classList.add('tableListRow');
   newListRow.appendChild(listRowIndicator);
   newListRow.appendChild(listRowDescriptor);
 
-  addBehaviorAndStyleToRowChildren(newListRow);
+  addBehaviorToRowChildren(newListRow);
 
   return newListRow;
 }
@@ -231,7 +229,7 @@ function handleRowCreation() {
     list = document.getElementById('tableList');
   }
 
-  let newListRow = createTableListRow();
+  let newListRow = initTableListRow();
 
   list.appendChild(newListRow);
 }
