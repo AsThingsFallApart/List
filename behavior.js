@@ -25,22 +25,22 @@ function handleDrop(event) {
       'application/x-moz-node'
     )}`
   );
-  let tableList = document.getElementById('tableList');
-  console.log(`tableList Element: ${tableList}`);
-  console.log(`tableList class: ${tableList.classList}`);
-  console.log(`event.target class: ${event.target.classList}`);
 
-  if (event.target.classList == 'tableList') {
+  if (
+    event.target.classList == 'list' ||
+    event.target.classList == 'listBody'
+  ) {
+    let list = document.getElementById('list');
+
     let draggedRowData = event.dataTransfer.getData('application/x-moz-node');
     console.log(`draggedRowData: ${draggedRowData}`);
-    let draggedRow = document.createElement('tr');
+    let draggedRow = list.insertRow(-1);
+
     draggedRow.innerHTML = draggedRowData;
-    draggedRow.classList = 'tableListRow';
+    draggedRow.classList = 'listRow';
     console.log(`draggedRow.innerHTML: ${draggedRow.innerHTML}`);
     addBehaviorToRowChildren(draggedRow);
     console.log(draggedRow);
-
-    tableList.appendChild(draggedRow);
   }
 }
 
@@ -60,72 +60,66 @@ function handleDragStart(event) {
 
 function handleTextSubstitution(event) {
   let currentText = event.target.textContent;
-  let currentTableListRowDescriptor = event.target;
+  let currentListRowDescriptor = event.target;
 
   let inputSubtitutor = document.createElement('input');
   inputSubtitutor.value = currentText;
-  inputSubtitutor.classList = 'tableListRowDescriptorSubstitution';
+  inputSubtitutor.classList = 'listRowDescriptorSubstitution';
   inputSubtitutor.addEventListener('keydown', substituteBackOnKeydown);
   inputSubtitutor.addEventListener('blur', substituteBackOnBlur);
   inputSubtitutor.addEventListener('keydown', handleRowDeletion);
   inputSubtitutor.addEventListener('blur', handleRowDeletion);
 
-  let parentTableListRow = currentTableListRowDescriptor.parentNode;
-  parentTableListRow.replaceChild(
-    inputSubtitutor,
-    currentTableListRowDescriptor
-  );
+  let parentListRow = currentListRowDescriptor.parentNode;
+  parentListRow.replaceChild(inputSubtitutor, currentListRowDescriptor);
 }
 
 function handleRowDeletion(event) {
-  let tableListRowSubstitutorContent = event.target.value;
+  let listRowSubstitutorContent = event.target.value;
 
-  if (event.key == 'Enter' && tableListRowSubstitutorContent == '') {
+  if (event.key == 'Enter' && listRowSubstitutorContent == '') {
     event.target.removeEventListener('blur', handleRowDeletion);
 
-    let tableListRow = event.target.parentNode;
-    let tableList = event.target.parentNode.parentNode;
+    let listRow = event.target.parentNode;
+    let list = event.target.parentNode.parentNode;
 
-    tableList.removeChild(tableListRow);
+    list.removeChild(listRow);
 
-    if (tableList.childNodes.length == 0) {
-      tableList.parentNode.removeChild(tableList);
+    if (list.childNodes.length == 0) {
+      list.parentNode.removeChild(list);
     }
-  } else if (event.key == 'Escape' && tableListRowSubstitutorContent == '') {
+  } else if (event.key == 'Escape' && listRowSubstitutorContent == '') {
     event.target.removeEventListener('blur', handleRowDeletion);
 
-    let tableListRow = event.target.parentNode;
-    let tableList = event.target.parentNode.parentNode;
+    let listRow = event.target.parentNode;
+    let list = event.target.parentNode.parentNode;
 
-    tableList.removeChild(tableListRow);
+    list.removeChild(listRow);
 
-    if (tableList.childNodes.length == 0) {
-      tableList.parentNode.removeChild(tableList);
+    if (list.childNodes.length == 0) {
+      list.parentNode.removeChild(list);
     }
-  } else if (event.type == 'blur' && tableListRowSubstitutorContent == '') {
-    let tableListRow = event.target.parentNode;
-    let tableList = event.target.parentNode.parentNode;
+  } else if (event.type == 'blur' && listRowSubstitutorContent == '') {
+    let listRow = event.target.parentNode;
+    let list = event.target.parentNode.parentNode;
 
-    tableList.removeChild(tableListRow);
+    list.removeChild(listRow);
 
-    if (tableList.childNodes.length == 0) {
-      tableList.parentNode.removeChild(tableList);
+    if (list.childNodes.length == 0) {
+      list.parentNode.removeChild(list);
     }
   }
 }
 
 function substituteBackOnBlur(event) {
   if (event.target.value != '') {
-    let newTableListRowDescriptor = document.createElement('td');
-    newTableListRowDescriptor.classList = 'tableListRowDescriptor';
-    newTableListRowDescriptor.textContent = event.target.value;
-    newTableListRowDescriptor.addEventListener(
-      'dblclick',
-      handleTextSubstitution
-    );
+    let newListRowDescriptor = document.createElement('td');
+    newListRowDescriptor.classList = 'listRowDescriptor';
+    newListRowDescriptor.textContent = event.target.value;
+    newListRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
 
-    let parentTableListRow = event.target.parentNode;
-    parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+    let parentListRow = event.target.parentNode;
+    parentListRow.replaceChild(newListRowDescriptor, event.target);
   }
 }
 
@@ -133,31 +127,25 @@ function substituteBackOnKeydown(event) {
   let inputSubtitutorValue = event.target.value;
 
   if (event.key == 'Enter' && inputSubtitutorValue != '') {
-    let newTableListRowDescriptor = document.createElement('td');
-    newTableListRowDescriptor.classList = 'tableListRowDescriptor';
-    newTableListRowDescriptor.textContent = event.target.value;
-    newTableListRowDescriptor.addEventListener(
-      'dblclick',
-      handleTextSubstitution
-    );
+    let newListRowDescriptor = document.createElement('td');
+    newListRowDescriptor.classList = 'listRowDescriptor';
+    newListRowDescriptor.textContent = event.target.value;
+    newListRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
 
     event.target.removeEventListener('blur', substituteBackOnBlur);
 
-    let parentTableListRow = event.target.parentNode;
-    parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+    let parentListRow = event.target.parentNode;
+    parentListRow.replaceChild(newListRowDescriptor, event.target);
   } else if (event.key == 'Escape' && inputSubtitutorValue != '') {
-    let newTableListRowDescriptor = document.createElement('td');
-    newTableListRowDescriptor.classList = 'tableListRowDescriptor';
-    newTableListRowDescriptor.textContent = event.target.value;
-    newTableListRowDescriptor.addEventListener(
-      'dblclick',
-      handleTextSubstitution
-    );
+    let newListRowDescriptor = document.createElement('td');
+    newListRowDescriptor.classList = 'listRowDescriptor';
+    newListRowDescriptor.textContent = event.target.value;
+    newListRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
 
     event.target.removeEventListener('blur', substituteBackOnBlur);
 
-    let parentTableListRow = event.target.parentNode;
-    parentTableListRow.replaceChild(newTableListRowDescriptor, event.target);
+    let parentListRow = event.target.parentNode;
+    parentListRow.replaceChild(newListRowDescriptor, event.target);
   }
 }
 
@@ -168,79 +156,82 @@ function createRowOnKeydown(event) {
 }
 
 function handleIndicatorClick(event) {
-  let tableListRowIndicator = event.target;
+  let listRowIndicator = event.target;
 
-  if (tableListRowIndicator.style.backgroundColor == crimson) {
-    tableListRowIndicator.style.backgroundColor = forestgreen;
-  } else if (tableListRowIndicator.style.backgroundColor == forestgreen) {
-    tableListRowIndicator.style.backgroundColor = crimson;
+  if (listRowIndicator.style.backgroundColor == crimson) {
+    listRowIndicator.style.backgroundColor = forestgreen;
+  } else if (listRowIndicator.style.backgroundColor == forestgreen) {
+    listRowIndicator.style.backgroundColor = crimson;
   }
 }
 
-function addBehaviorToRowChildren(HTMLTableListRow) {
-  console.log(HTMLTableListRow.childNodes);
-
-  let rowColumns = HTMLTableListRow.childNodes;
+function addBehaviorToRowChildren(HTMLListRow) {
+  let rowColumns = HTMLListRow.childNodes;
 
   for (let i = 0; i < rowColumns.length; i++) {
-    if (rowColumns[i].classList == 'tableListRowIndicator') {
+    if (rowColumns[i].classList == 'listRowIndicator') {
       rowColumns[i].addEventListener('click', handleIndicatorClick);
       rowColumns[i].draggable = true;
       rowColumns[i].addEventListener('dragstart', handleDragStart);
-    } else if (rowColumns[i].classList == 'tableListRowDescriptor') {
+    } else if (rowColumns[i].classList == 'listRowDescriptor') {
       rowColumns[i].addEventListener('dblclick', handleTextSubstitution);
     }
   }
 }
 
-function initTableListRow() {
+function initListRow(newListRow) {
   let listRowIndicator = document.createElement('td');
-  listRowIndicator.classList.add('tableListRowIndicator');
+  listRowIndicator.classList.add('listRowIndicator');
   listRowIndicator.style.backgroundColor = defaultColor;
 
   let listRowDescriptor = document.createElement('td');
-  listRowDescriptor.classList.add('tableListRowDescriptor');
+  listRowDescriptor.classList.add('listRowDescriptor');
   listRowDescriptor.textContent = document.getElementById('inputBox').value;
 
-  let newListRow = document.createElement('tr');
-  newListRow.classList.add('tableListRow');
+  newListRow.classList.add('listRow');
   newListRow.appendChild(listRowIndicator);
   newListRow.appendChild(listRowDescriptor);
   newListRow.addEventListener('click', handleClick);
 
   addBehaviorToRowChildren(newListRow);
+}
 
-  return newListRow;
+function initList() {
+  let newList = document.createElement('table');
+
+  newList.id = 'list';
+  newList.classList = 'list';
+
+  let newListBody = newList.createTBody();
+  newListBody.classList = 'listBody';
+  newListBody.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+    console.log('entering drag area');
+    console.log(`event target: ${event.target}`);
+    event.dataTransfer.dropEffect = 'move';
+  });
+  newListBody.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    console.log('entering drag area again');
+    event.dataTransfer.dropEffect = 'move';
+  });
+  newListBody.addEventListener('drop', handleDrop);
+
+  return newList;
 }
 
 function handleRowCreation() {
   let list;
 
-  if (document.getElementById('tableList') == undefined) {
-    list = document.createElement('table');
-    list.id = 'tableList';
-    list.classList = 'tableList';
-    list.addEventListener('dragenter', (event) => {
-      event.preventDefault();
-      console.log('entering drag area');
-      console.log(`event target: ${event.target}`);
-      event.dataTransfer.dropEffect = 'move';
-    });
-    list.addEventListener('dragover', (event) => {
-      event.preventDefault();
-      console.log('entering drag area again');
-      console.log(`event.dataTransfer.types: ${event.dataTransfer.types}`);
-      event.dataTransfer.dropEffect = 'move';
-    });
-    list.addEventListener('drop', handleDrop);
+  if (document.getElementById('list') == undefined) {
+    list = initList();
 
     let listDiv = document.getElementsByClassName('listDiv')[0];
     listDiv.appendChild(list);
   } else {
-    list = document.getElementById('tableList');
+    list = document.getElementById('list');
   }
 
-  let newListRow = initTableListRow();
-
-  list.appendChild(newListRow);
+  let newListRow = list.insertRow(-1);
+  initListRow(newListRow);
 }

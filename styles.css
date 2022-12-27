@@ -2,7 +2,7 @@
   background-color: gainsboro;
 }
 
-.instantiation {
+.control {
   display: flex;
   flex-direction: row;
   background-color: darkgray;
@@ -27,32 +27,37 @@
 }
 
 .listDiv {
-  background-color: white;
   margin-top: 10px;
   width: 100%;
 }
 
-.tableList {
+.list {
+  background-color: white;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.listBody {
   width: 100%;
   border: 1px solid #333;
   border-collapse: collapse;
 }
 
-.tableListRow {
+.listRow {
   height: 2.5em;
   display: flex;
   border-collapse: collapse;
   justify-content: center;
 }
 
-.tableListRowIndicator {
+.listRowIndicator {
   background-color: crimson;
   width: 20%;
   border: 1px solid #333;
   cursor: row-resize;
 }
 
-.tableListRowDescriptor {
+.listRowDescriptor {
   width: 80%;
   border: 1px solid #333;
   display: flex;
@@ -60,7 +65,7 @@
   justify-content: center;
 }
 
-.tableListRowDescriptorSubstitution {
+.listRowDescriptorSubstitution {
   width: 80%;
   display: flex;
   align-items: center;
