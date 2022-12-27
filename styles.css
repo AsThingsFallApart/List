@@ -45,9 +45,38 @@
   border-collapse: collapse;
 }
 
+.listBody > .listRowPlaceholder {
+  width: 100%;
+  border: 1px dashed deepskyblue;
+  border-collapse: collapse;
+}
+
+.listBody > .listRowDescriptorPlaceholder {
+  width: 100%;
+  border: 1px dashed deepskyblue;
+  border-collapse: collapse;
+}
+
+.listBody > .listRowIndicatorPlaceholder {
+  width: 100%;
+  border: 1px dashed deepskyblue;
+  border-collapse: collapse;
+}
+
 .listRow {
   height: 2.5em;
   display: flex;
+  border-collapse: collapse;
+  justify-content: center;
+}
+
+.listRowPlaceholder {
+  background-color: azure;
+  height: 2.5em;
+  display: flex;
+  border-width: 1px;
+  border-color: deepskyblue;
+  border-style: dashed;
   border-collapse: collapse;
   justify-content: center;
 }
@@ -59,9 +88,24 @@
   cursor: row-resize;
 }
 
+.listRowIndicatorPlaceholder {
+  background-color: azure;
+  width: 20%;
+  border: 1px dashed deepskyblue;
+}
+
 .listRowDescriptor {
   width: 80%;
   border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.listRowDescriptorPlaceholder {
+  background-color: azure;
+  width: 80%;
+  border: 1px dashed deepskyblue;
   display: flex;
   align-items: center;
   justify-content: center;

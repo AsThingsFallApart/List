@@ -2,6 +2,11 @@ const crimson = 'rgb(220, 20, 60)';
 const forestgreen = 'rgb(34, 139, 34)';
 
 let defaultColor = crimson;
+let isDragging = false;
+let dragOrigin = 0;
+let placeholderRowIndex = 0;
+let oldPlaceholderTopNeighborIndex = 0;
+let oldPlaceholderBottomNeighborIndex = 0;
 
 let rowCreator = document.getElementById('creator');
 rowCreator.addEventListener('click', handleRowCreation);
@@ -9,17 +14,141 @@ rowCreator.addEventListener('click', handleRowCreation);
 let rowTextInputBox = document.getElementById('inputBox');
 rowTextInputBox.addEventListener('keydown', createRowOnKeydown);
 
+function subtitutePlaceholder() {}
+
+function insertPlaceholder(insertionIndex) {
+  let list = document.getElementById('list');
+
+  let listRowIndicatorPlaceholder = document.createElement('td');
+  listRowIndicatorPlaceholder.classList = 'listRowIndicatorPlaceholder';
+
+  let listRowDescriptorPlaceholder = document.createElement('td');
+  listRowDescriptorPlaceholder.classList = 'listRowDescriptorPlaceholder';
+
+  let newListRowPlaceholder = list.insertRow(insertionIndex);
+  newListRowPlaceholder.classList = 'listRowPlaceholder';
+  newListRowPlaceholder.appendChild(listRowIndicatorPlaceholder);
+  newListRowPlaceholder.appendChild(listRowDescriptorPlaceholder);
+  newListRowPlaceholder.addEventListener('dragover', (event) => {
+    event.preventDefault();
+  });
+  newListRowPlaceholder.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+  });
+  newListRowPlaceholder.addEventListener('drop', handleDrop);
+}
+
+function handlePlaceholderPositioning(event) {
+  event.preventDefault();
+  // console.log(`The cursor is at ${event.offsetX}, ${event.offsetY}.`);
+  let currentRow = event.target.parentNode;
+  let listBody = document.getElementsByClassName('listBody')[0];
+  let currentRowIndex = Array.prototype.indexOf.call(
+    listBody.childNodes,
+    currentRow
+  );
+  let topNeighborIndex = dragOrigin - 1;
+  let bottomNeighborIndex = dragOrigin + 1;
+  console.log(`dragOrigin: ${dragOrigin}`);
+  console.log(`topNeighborIndex: ${topNeighborIndex}`);
+  console.log(`bottomNeightborIndex: ${bottomNeighborIndex}`);
+  console.log(`currentRowIndex: ${currentRowIndex}`);
+
+  if (currentRowIndex == topNeighborIndex) {
+    console.log(`This element ${currentRowIndex} is the top neighbor.`);
+  }
+
+  if (currentRowIndex == bottomNeighborIndex) {
+    console.log(`This element ${currentRowIndex} is the bottom neighbor.`);
+  }
+
+  let rowOffsetYBottomFourth = currentRow.offsetHeight / 4;
+  let rowOffsetYTopFourth = currentRow.offsetHeight - rowOffsetYBottomFourth;
+
+  if (event.offsetY > rowOffsetYTopFourth) {
+    // position placeholder below the row
+    let newPlaceholderTopNeighborIndex = currentRowIndex;
+    let newPlaceholderBottomNeighborIndex = currentRowIndex + 2;
+    console.log(`\tIn the lower half of element ${currentRowIndex}`);
+    console.log(`\tPlacing placeholder below current row...`);
+    console.log(`\tyThreshold: ${rowOffsetYTopFourth}`);
+    console.log(`\tevent.offsetY: ${event.offsetY}`);
+    console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
+    console.log('\tCurrent placeholder pair:');
+    console.log(
+      `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+    );
+    console.log(
+      `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+    );
+    console.log('\tProposed placeholder pair:');
+    console.log(
+      `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
+    );
+    console.log(
+      `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+    );
+
+    if (
+      newPlaceholderBottomNeighborIndex != oldPlaceholderBottomNeighborIndex ||
+      newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
+    ) {
+      console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
+      insertPlaceholder(currentRowIndex + 1);
+      placeholderRowIndex = currentRowIndex + 1;
+      oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
+      oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+    }
+  } else if (event.offsetY < rowOffsetYBottomFourth) {
+    // position placeholder above the row
+    let newPlaceholderTopNeighborIndex = currentRowIndex - 2;
+    let newPlaceholderBottomNeighborIndex = currentRowIndex;
+    console.log(`\tIn the upper half of element ${currentRowIndex}`);
+    console.log(`\tPlacing placeholder above current row...`);
+    console.log(`\tyThreshold: ${rowOffsetYBottomFourth}`);
+    console.log(`\tevent.offsetY: ${event.offsetY}`);
+    console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
+    console.log('\tCurrent placeholder pair:');
+    console.log(
+      `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+    );
+    console.log(
+      `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+    );
+    console.log('\tProposed placeholder pair:');
+    console.log(
+      `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
+    );
+    console.log(
+      `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+    );
+
+    if (
+      newPlaceholderBottomNeighborIndex != oldPlaceholderBottomNeighborIndex ||
+      newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
+    ) {
+      console.log(`Positioning placeholder at ${currentRowIndex}...`);
+      insertPlaceholder(currentRowIndex);
+      placeholderRowIndex = currentRowIndex;
+      oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
+      oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+    }
+  }
+}
+
 function handleClick(event) {
   let clickedRow = event.target;
 
   console.log(`ID of ${clickedRow}: ${clickedRow.id}`);
   console.log(`Content of ${clickedRow}: ${clickedRow.textContent}`);
+  console.dir(clickedRow);
+  console.log(`placeholderExists: ${placeholderExists}`);
 }
 
 function handleDrop(event) {
   event.preventDefault();
   console.log('dropped');
-  console.log(`event target: ${event.target}`);
+  console.log(`event.target.classList: ${event.target.classList}`);
   console.log(
     `event.dataTransfer.data: ${event.dataTransfer.getData(
       'application/x-moz-node'
@@ -27,8 +156,9 @@ function handleDrop(event) {
   );
 
   if (
-    event.target.classList == 'list' ||
-    event.target.classList == 'listBody'
+    event.target.classList == 'listRowPlaceholder' ||
+    event.target.classList == 'listRowDescriptorPlaceholder' ||
+    event.target.classList == 'listRowIndicatorPlaceholder'
   ) {
     let list = document.getElementById('list');
 
@@ -48,10 +178,15 @@ function handleDrop(event) {
     addBehaviorToRowChildren(newListRow);
     console.log(newListRow);
   }
+
+  isDragging = false;
 }
 
 function handleDragStart(event) {
   let draggedRow = event.target.parentNode;
+
+  console.log(`isDragging: ${isDragging}`);
+
   event.dataTransfer.setDragImage(draggedRow, 0, 0);
 
   event.dataTransfer.setData('application/x-moz-node', draggedRow.innerHTML);
@@ -62,12 +197,14 @@ function handleDragStart(event) {
 
   let listBody = draggedRow.parentNode;
 
+  console.log(draggedRow);
+
   let draggedRowIndex = Array.prototype.indexOf.call(
     listBody.childNodes,
     draggedRow
   );
-  console.log(`draggedRowIndex: ${draggedRowIndex}`);
   event.dataTransfer.setData('index', draggedRowIndex);
+  dragOrigin = draggedRowIndex;
 }
 
 function handleTextSubstitution(event) {
@@ -219,14 +356,9 @@ function initList() {
   newListBody.addEventListener('dragenter', (event) => {
     event.preventDefault();
     console.log('entering drag area');
-    console.log(`event target: ${event.target}`);
     event.dataTransfer.dropEffect = 'move';
   });
-  newListBody.addEventListener('dragover', (event) => {
-    event.preventDefault();
-    console.log('entering drag area again');
-    event.dataTransfer.dropEffect = 'move';
-  });
+  newListBody.addEventListener('dragover', handlePlaceholderPositioning);
   newListBody.addEventListener('drop', handleDrop);
 
   return newList;
