@@ -1,14 +1,16 @@
 .body {
-  background-color: gainsboro;
+  background-color: darkgray;
 }
 
 .control {
   display: flex;
   flex-direction: row;
-  background-color: darkgray;
+  background-color: gainsboro;
   justify-content: space-evenly;
   align-items: center;
   padding: 10px;
+  border: 1px dashed #333;
+  border-radius: 10px;
 }
 
 .creator {

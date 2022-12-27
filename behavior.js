@@ -32,30 +32,42 @@ function handleDrop(event) {
   ) {
     let list = document.getElementById('list');
 
-    let draggedRowData = event.dataTransfer.getData('application/x-moz-node');
-    console.log(`draggedRowData: ${draggedRowData}`);
-    let draggedRow = list.insertRow(-1);
+    let draggedRowInnerHTML = event.dataTransfer.getData(
+      'application/x-moz-node'
+    );
+    console.log(`draggedRowInnerHTML: ${draggedRowInnerHTML}`);
 
-    draggedRow.innerHTML = draggedRowData;
-    draggedRow.classList = 'listRow';
-    console.log(`draggedRow.innerHTML: ${draggedRow.innerHTML}`);
-    addBehaviorToRowChildren(draggedRow);
-    console.log(draggedRow);
+    let draggedRowIndex = event.dataTransfer.getData('index');
+    console.log(`draggedRowIndex: ${draggedRowIndex}`);
+
+    list.deleteRow(draggedRowIndex);
+
+    let newListRow = list.insertRow(-1);
+    newListRow.innerHTML = draggedRowInnerHTML;
+    newListRow.classList = 'listRow';
+    addBehaviorToRowChildren(newListRow);
+    console.log(newListRow);
   }
 }
 
 function handleDragStart(event) {
+  let draggedRow = event.target.parentNode;
+  event.dataTransfer.setDragImage(draggedRow, 0, 0);
+
+  event.dataTransfer.setData('application/x-moz-node', draggedRow.innerHTML);
   console.log(
-    `Is ${event.target.parentNode} a Node: ${
-      event.target.parentNode instanceof Node
-    }`
+    `event.target.parentNode.textContext: ${event.target.parentNode.textContent}`
   );
-  console.log(event.target.parentNode);
-  event.dataTransfer.setData(
-    'application/x-moz-node',
-    event.target.parentNode.innerHTML
+  event.dataTransfer.setData('text/plain', draggedRow.textContent);
+
+  let listBody = draggedRow.parentNode;
+
+  let draggedRowIndex = Array.prototype.indexOf.call(
+    listBody.childNodes,
+    draggedRow
   );
-  event.dataTransfer.setDragImage(event.target.parentNode, 0, 0);
+  console.log(`draggedRowIndex: ${draggedRowIndex}`);
+  event.dataTransfer.setData('index', draggedRowIndex);
 }
 
 function handleTextSubstitution(event) {
