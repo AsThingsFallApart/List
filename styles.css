@@ -22,23 +22,26 @@
 .tableList {
   width: 100%;
   border: 1px solid #333;
+  border-collapse: collapse;
 }
 
 .tableListRow {
-  border: 1px solid #333;
   height: 2.5em;
   display: flex;
+  border-collapse: collapse;
   justify-content: center;
 }
 
 .tableListRowIndicator {
   background-color: crimson;
-  border-right: 1px solid #333;
   width: 20%;
+  border: 1px solid #333;
+  cursor: row-resize;
 }
 
 .tableListRowDescriptor {
   width: 80%;
+  border: 1px solid #333;
   display: flex;
   align-items: center;
   justify-content: center;

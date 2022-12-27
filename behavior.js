@@ -9,6 +9,13 @@ rowCreator.addEventListener('click', handleRowCreation);
 let rowTextInputBox = document.getElementById('inputBox');
 rowTextInputBox.addEventListener('keydown', createRowOnKeydown);
 
+function handleClick(event) {
+  let clickedRow = event.target;
+
+  console.log(`ID of ${clickedRow}: ${clickedRow.id}`);
+  console.log(`Content of ${clickedRow}: ${clickedRow.textContent}`);
+}
+
 function handleDrop(event) {
   event.preventDefault();
   console.log('dropped');
@@ -199,6 +206,7 @@ function initTableListRow() {
   newListRow.classList.add('tableListRow');
   newListRow.appendChild(listRowIndicator);
   newListRow.appendChild(listRowDescriptor);
+  newListRow.addEventListener('click', handleClick);
 
   addBehaviorToRowChildren(newListRow);
 
