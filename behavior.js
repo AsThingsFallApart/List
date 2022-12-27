@@ -234,8 +234,8 @@ function handleRowCreation() {
     });
     list.addEventListener('drop', handleDrop);
 
-    let listArea = document.getElementsByClassName('list')[0];
-    listArea.appendChild(list);
+    let listDiv = document.getElementsByClassName('listDiv')[0];
+    listDiv.appendChild(list);
   } else {
     list = document.getElementById('tableList');
   }

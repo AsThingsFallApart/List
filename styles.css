@@ -4,19 +4,32 @@
 
 .instantiation {
   display: flex;
-  background-color: lavender;
+  flex-direction: row;
+  background-color: darkgray;
   justify-content: space-evenly;
   align-items: center;
-  padding: 2%;
+  padding: 10px;
 }
 
 .creator {
   background-color: azure;
 }
 
-.list {
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.listDiv {
   background-color: white;
-  margin: 3%;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .tableList {
