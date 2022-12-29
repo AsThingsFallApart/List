@@ -29,12 +29,7 @@ function insertPlaceholder(insertionIndex) {
   newListRowPlaceholder.classList = 'listRowPlaceholder';
   newListRowPlaceholder.appendChild(listRowIndicatorPlaceholder);
   newListRowPlaceholder.appendChild(listRowDescriptorPlaceholder);
-  newListRowPlaceholder.addEventListener('dragover', (event) => {
-    event.preventDefault();
-  });
-  newListRowPlaceholder.addEventListener('dragenter', (event) => {
-    event.preventDefault();
-  });
+
   newListRowPlaceholder.addEventListener('drop', handleDrop);
 }
 
@@ -341,6 +336,7 @@ function initListRow(newListRow) {
   newListRow.appendChild(listRowIndicator);
   newListRow.appendChild(listRowDescriptor);
   newListRow.addEventListener('click', handleClick);
+  newListRow.addEventListener('dragover', handlePlaceholderPositioning);
 
   addBehaviorToRowChildren(newListRow);
 }
@@ -353,13 +349,6 @@ function initList() {
 
   let newListBody = newList.createTBody();
   newListBody.classList = 'listBody';
-  newListBody.addEventListener('dragenter', (event) => {
-    event.preventDefault();
-    console.log('entering drag area');
-    event.dataTransfer.dropEffect = 'move';
-  });
-  newListBody.addEventListener('dragover', handlePlaceholderPositioning);
-  newListBody.addEventListener('drop', handleDrop);
 
   return newList;
 }
