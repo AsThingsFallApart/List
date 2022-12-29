@@ -7,6 +7,7 @@ let dragOrigin = 0;
 let placeholderRowIndex = undefined;
 let oldPlaceholderTopNeighborIndex = 0;
 let oldPlaceholderBottomNeighborIndex = 0;
+let placeholderExists = false;
 
 let rowCreator = document.getElementById('creator');
 rowCreator.addEventListener('click', handleRowCreation);
@@ -41,10 +42,12 @@ function initPlaceholder(insertionIndex) {
     listBody.appendChild(newListRowPlaceholder);
   }
 
-  newListRowPlaceholder.addEventListener('dropover', (event) => {
+  newListRowPlaceholder.addEventListener('dragover', (event) => {
     event.preventDefault();
+    console.log('Cursor is over the placeholder.');
   });
   newListRowPlaceholder.addEventListener('dragenter', (event) => {
+    console.log('Cursor has entered the placeholder area');
     event.preventDefault();
   });
   newListRowPlaceholder.addEventListener('drop', handleDrop);
@@ -113,6 +116,7 @@ function handlePlaceholderPositioning(event) {
       placeholderRowIndex = currentRowIndex + 1;
       oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
       oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+      placeholderExists = true;
     }
   } else if (event.offsetY < rowOffsetYBottomFourth) {
     // position placeholder above the row
@@ -150,6 +154,7 @@ function handlePlaceholderPositioning(event) {
       placeholderRowIndex = currentRowIndex;
       oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
       oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+      placeholderExists = true;
     }
   }
 }
@@ -178,7 +183,8 @@ function handleDrop(event) {
     event.target.classList == 'listRowDescriptorPlaceholder' ||
     event.target.classList == 'listRowIndicatorPlaceholder'
   ) {
-    let list = document.getElementById('list');
+    let listBody = document.getElementsByClassName('listBody')[0];
+    let newListRow;
 
     let draggedRowInnerHTML = event.dataTransfer.getData(
       'application/x-moz-node'
@@ -188,16 +194,24 @@ function handleDrop(event) {
     let draggedRowIndex = event.dataTransfer.getData('index');
     console.log(`draggedRowIndex: ${draggedRowIndex}`);
 
-    list.deleteRow(draggedRowIndex);
+    if (placeholderRowIndex > listBody.childElementCount) {
+      listBody.appendChild(newListRow);
+      listBody.deleteRow(placeholderRowIndex);
+    } else {
+      listBody.deleteRow(placeholderRowIndex);
+      newListRow = listBody.insertRow(placeholderRowIndex);
+    }
 
-    let newListRow = list.insertRow(-1);
+    if (placeholderRowIndex < draggedRowIndex) {
+      draggedRowIndex++;
+    }
+
+    listBody.deleteRow(draggedRowIndex);
+
     newListRow.innerHTML = draggedRowInnerHTML;
     newListRow.classList = 'listRow';
     addBehaviorToRowChildren(newListRow);
-    console.log(newListRow);
   }
-
-  isDragging = false;
 }
 
 function handleDragStart(event) {
