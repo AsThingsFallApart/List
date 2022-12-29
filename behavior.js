@@ -4,7 +4,7 @@ const forestgreen = 'rgb(34, 139, 34)';
 let defaultColor = crimson;
 let isDragging = false;
 let dragOrigin = 0;
-let placeholderRowIndex = 0;
+let placeholderRowIndex = undefined;
 let oldPlaceholderTopNeighborIndex = 0;
 let oldPlaceholderBottomNeighborIndex = 0;
 
@@ -16,8 +16,9 @@ rowTextInputBox.addEventListener('keydown', createRowOnKeydown);
 
 function subtitutePlaceholder() {}
 
-function insertPlaceholder(insertionIndex) {
-  let list = document.getElementById('list');
+function initPlaceholder(insertionIndex) {
+  let listBody = document.getElementsByClassName('listBody')[0];
+  let newListRowPlaceholder;
 
   let listRowIndicatorPlaceholder = document.createElement('td');
   listRowIndicatorPlaceholder.classList = 'listRowIndicatorPlaceholder';
@@ -25,11 +26,27 @@ function insertPlaceholder(insertionIndex) {
   let listRowDescriptorPlaceholder = document.createElement('td');
   listRowDescriptorPlaceholder.classList = 'listRowDescriptorPlaceholder';
 
-  let newListRowPlaceholder = list.insertRow(insertionIndex);
-  newListRowPlaceholder.classList = 'listRowPlaceholder';
-  newListRowPlaceholder.appendChild(listRowIndicatorPlaceholder);
-  newListRowPlaceholder.appendChild(listRowDescriptorPlaceholder);
+  console.dir(listBody);
 
+  if (insertionIndex < listBody.childElementCount) {
+    newListRowPlaceholder = listBody.insertRow(insertionIndex);
+    newListRowPlaceholder.classList = 'listRowPlaceholder';
+    newListRowPlaceholder.appendChild(listRowIndicatorPlaceholder);
+    newListRowPlaceholder.appendChild(listRowDescriptorPlaceholder);
+  } else {
+    newListRowPlaceholder = document.createElement('tr');
+    newListRowPlaceholder.classList = 'listRowPlaceholder';
+    newListRowPlaceholder.appendChild(listRowIndicatorPlaceholder);
+    newListRowPlaceholder.appendChild(listRowDescriptorPlaceholder);
+    listBody.appendChild(newListRowPlaceholder);
+  }
+
+  newListRowPlaceholder.addEventListener('dropover', (event) => {
+    event.preventDefault();
+  });
+  newListRowPlaceholder.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+  });
   newListRowPlaceholder.addEventListener('drop', handleDrop);
 }
 
@@ -89,7 +106,10 @@ function handlePlaceholderPositioning(event) {
       newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
     ) {
       console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
-      insertPlaceholder(currentRowIndex + 1);
+      if (placeholderRowIndex != undefined) {
+        listBody.deleteRow(placeholderRowIndex);
+      }
+      initPlaceholder(currentRowIndex + 1);
       placeholderRowIndex = currentRowIndex + 1;
       oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
       oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
@@ -123,7 +143,10 @@ function handlePlaceholderPositioning(event) {
       newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
     ) {
       console.log(`Positioning placeholder at ${currentRowIndex}...`);
-      insertPlaceholder(currentRowIndex);
+      if (placeholderRowIndex != undefined) {
+        listBody.deleteRow(placeholderRowIndex);
+      }
+      initPlaceholder(currentRowIndex);
       placeholderRowIndex = currentRowIndex;
       oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
       oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
