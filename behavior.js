@@ -4,10 +4,10 @@ const forestgreen = 'rgb(34, 139, 34)';
 let defaultColor = crimson;
 let isDragging = false;
 let dragOrigin = 0;
+let placeholderExists = false;
 let placeholderRowIndex = undefined;
 let oldPlaceholderTopNeighborIndex = 0;
 let oldPlaceholderBottomNeighborIndex = 0;
-let placeholderExists = false;
 
 let rowCreator = document.getElementById('creator');
 rowCreator.addEventListener('click', handleRowCreation);
@@ -68,6 +68,7 @@ function handlePlaceholderPositioning(event) {
   console.log(`topNeighborIndex: ${topNeighborIndex}`);
   console.log(`bottomNeightborIndex: ${bottomNeighborIndex}`);
   console.log(`currentRowIndex: ${currentRowIndex}`);
+  console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
 
   if (currentRowIndex == topNeighborIndex) {
     console.log(`This element ${currentRowIndex} is the top neighbor.`);
@@ -110,7 +111,20 @@ function handlePlaceholderPositioning(event) {
     ) {
       console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
       if (placeholderRowIndex != undefined) {
-        listBody.deleteRow(placeholderRowIndex);
+        console.log(`Number of available rows: ${listBody.childElementCount}`);
+        console.log(
+          `Trying to delete placeholder from index ${placeholderRowIndex}...`
+        );
+        if (placeholderRowIndex == listBody.childElementCount) {
+          // delete last row
+          console.log(
+            `Placeholder is at the end of the list: deleting last row.`
+          );
+          listBody.deleteRow(-1);
+        } else {
+          console.log(`Deleting row at index ${placeholderRowIndex}`);
+          listBody.deleteRow(placeholderRowIndex);
+        }
       }
       initPlaceholder(currentRowIndex + 1);
       placeholderRowIndex = currentRowIndex + 1;
@@ -148,7 +162,20 @@ function handlePlaceholderPositioning(event) {
     ) {
       console.log(`Positioning placeholder at ${currentRowIndex}...`);
       if (placeholderRowIndex != undefined) {
-        listBody.deleteRow(placeholderRowIndex);
+        console.log(`Number of available rows: ${listBody.childElementCount}`);
+        console.log(
+          `Trying to delete placeholder from index ${placeholderRowIndex}...`
+        );
+        if (placeholderRowIndex == listBody.childElementCount) {
+          // delete last row in list
+          console.log(
+            `Available rows = placeholder index. Deleting last row...`
+          );
+          listBody.deleteRow(-1);
+        } else {
+          console.log(`Deleting row at index ${placeholderRowIndex}...`);
+          listBody.deleteRow(placeholderRowIndex);
+        }
       }
       initPlaceholder(currentRowIndex);
       placeholderRowIndex = currentRowIndex;
@@ -177,6 +204,7 @@ function handleDrop(event) {
       'application/x-moz-node'
     )}`
   );
+  console.log(`boolean 'placeholderExists': ${placeholderExists}`);
 
   if (
     event.target.classList == 'listRowPlaceholder' ||
@@ -198,20 +226,35 @@ function handleDrop(event) {
       listBody.appendChild(newListRow);
       listBody.deleteRow(placeholderRowIndex);
     } else {
-      listBody.deleteRow(placeholderRowIndex);
-      newListRow = listBody.insertRow(placeholderRowIndex);
+      if (placeholderRowIndex == listBody.childElementCount) {
+        listBody.deleteRow(-1);
+        newListRow = listBody.insertRow(placeholderRowIndex - 1);
+      } else {
+        listBody.deleteRow(placeholderRowIndex);
+        newListRow = listBody.insertRow(placeholderRowIndex);
+      }
     }
 
     if (placeholderRowIndex < draggedRowIndex) {
       draggedRowIndex++;
     }
 
-    listBody.deleteRow(draggedRowIndex);
+    if (draggedRowIndex == listBody.childElementCount) {
+      listBody.deleteRow(-1);
+    } else {
+      listBody.deleteRow(draggedRowIndex);
+    }
 
     newListRow.innerHTML = draggedRowInnerHTML;
     newListRow.classList = 'listRow';
     addBehaviorToRowChildren(newListRow);
   }
+
+  placeholderRowIndex = undefined;
+  placeholderExists = false;
+
+  console.log(`placeholderExists: ${placeholderExists}`);
+  console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
 }
 
 function handleDragStart(event) {
