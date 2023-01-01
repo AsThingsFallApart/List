@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<head>
-  <title>ListGen</title>
-  <link rel="stylesheet" type="text/css" href="styles.css" />
-</head>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ListGen</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
 
-<body class="body">
-  <div class="flexColumn">
-    <div class="control">
-      <button id="creator" class="creator">Create Row</button>
-      <input id="inputBox" placeholder="Row Content" />
+  <body class="body">
+    <div class="flexColumn">
+      <div class="control">
+        <button id="creator" class="creator" type="submit">Create Row</button>
+        <input id="inputBox" placeholder="Row Content" />
+      </div>
+      <div class="flexRow">
+        <div class="listDiv"></div>
+      </div>
     </div>
-    <div class="flexRow">
-      <div class="listDiv"></div>
-    </div>
-  </div>
 
-  <script src="behavior.js"></script>
-</body>
+    <script src="behavior.js"></script>
+  </body>
+</html>
