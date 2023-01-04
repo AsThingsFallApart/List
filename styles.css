@@ -5,10 +5,7 @@
 
 .body {
   background-color: darkgray;
-  margin-left: 2.5rem;
-  margin-right: 2.5rem;
-  margin-top: 1.5rem;
-  height: 100%;
+  margin: 0px;
 }
 
 .control {
@@ -18,11 +15,16 @@
   justify-content: space-evenly;
   align-items: center;
   padding: 1.1rem;
-  border: 1px dashed #333;
-  border-radius: 10px;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  gap: 1rem;
 }
 
 .creator {
+  background-color: azure;
+}
+
+.creatorContent {
   background-color: azure;
 }
 
@@ -38,8 +40,10 @@
 }
 
 .listDiv {
-  margin-top: 1.5rem;
+  margin-top: 0.75rem;
   width: 100%;
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
 }
 
 .list {
@@ -73,15 +77,23 @@
 }
 
 .listRow {
-  height: 2.5em;
+  height: 2.5rem;
   display: flex;
   border-collapse: collapse;
   justify-content: center;
 }
 
+.listRowControl {
+  width: 5%;
+  border-right: 1px solid #333;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  border-collapse: collapse;
+}
+
 .listRowPlaceholder {
   background-color: azure;
-  height: 2.5em;
+  height: 2.5rem;
   display: flex;
   border-width: 1px;
   border-color: deepskyblue;
@@ -105,7 +117,10 @@
 
 .listRowDescriptor {
   width: 80%;
-  border: 1px solid #333;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
   display: flex;
   align-items: center;
   justify-content: center;
