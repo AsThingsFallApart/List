@@ -15,7 +15,14 @@ rowCreator.addEventListener('click', handleRowCreation);
 let rowTextInputBox = document.getElementById('inputBox');
 rowTextInputBox.addEventListener('keydown', createRowOnKeydown);
 
-function subtitutePlaceholder() {}
+let entireDocument = document.getElementsByClassName('html')[0];
+entireDocument.addEventListener('dragenter', preventDefaultBehavior);
+entireDocument.addEventListener('dragover', preventDefaultBehavior);
+entireDocument.addEventListener('drop', handleDrop);
+
+function preventDefaultBehavior(event) {
+  event.preventDefault();
+}
 
 function initPlaceholder(insertionIndex) {
   let listBody = document.getElementsByClassName('listBody')[0];
@@ -45,10 +52,11 @@ function initPlaceholder(insertionIndex) {
   newListRowPlaceholder.addEventListener('dragover', (event) => {
     event.preventDefault();
     console.log('Cursor is over the placeholder.');
+    event.dataTransfer.dropEffect = 'move';
   });
   newListRowPlaceholder.addEventListener('dragenter', (event) => {
-    console.log('Cursor has entered the placeholder area');
     event.preventDefault();
+    console.log('Cursor has entered the placeholder area');
   });
   newListRowPlaceholder.addEventListener('drop', handleDrop);
 }
@@ -109,11 +117,12 @@ function handlePlaceholderPositioning(event) {
       newPlaceholderBottomNeighborIndex != oldPlaceholderBottomNeighborIndex ||
       newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
     ) {
-      console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
       if (placeholderRowIndex != undefined) {
-        console.log(`Number of available rows: ${listBody.childElementCount}`);
         console.log(
-          `Trying to delete placeholder from index ${placeholderRowIndex}...`
+          `\tNumber of available rows: ${listBody.childElementCount}`
+        );
+        console.log(
+          `\tTrying to delete placeholder from index ${placeholderRowIndex}...`
         );
         if (placeholderRowIndex == listBody.childElementCount) {
           // delete last row
@@ -126,6 +135,7 @@ function handlePlaceholderPositioning(event) {
           listBody.deleteRow(placeholderRowIndex);
         }
       }
+      console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
       initPlaceholder(currentRowIndex + 1);
       placeholderRowIndex = currentRowIndex + 1;
       oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
@@ -206,11 +216,11 @@ function handleDrop(event) {
   );
   console.log(`boolean 'placeholderExists': ${placeholderExists}`);
 
-  if (
-    event.target.classList == 'listRowPlaceholder' ||
-    event.target.classList == 'listRowDescriptorPlaceholder' ||
-    event.target.classList == 'listRowIndicatorPlaceholder'
-  ) {
+  console.log('The event:');
+  console.log(event);
+
+  // TODO: check if dataTransfer object has a format 'applciation/x-moz-node'
+  if (true) {
     let listBody = document.getElementsByClassName('listBody')[0];
     let newListRow;
 
@@ -247,6 +257,7 @@ function handleDrop(event) {
 
     newListRow.innerHTML = draggedRowInnerHTML;
     newListRow.classList = 'listRow';
+    newListRow.addEventListener('dragover', handlePlaceholderPositioning);
     addBehaviorToRowChildren(newListRow);
   }
 
@@ -263,6 +274,7 @@ function handleDragStart(event) {
   console.log(`isDragging: ${isDragging}`);
 
   event.dataTransfer.setDragImage(draggedRow, 0, 0);
+  event.dataTransfer.effectAllowed = 'move';
 
   event.dataTransfer.setData('application/x-moz-node', draggedRow.innerHTML);
   console.log(

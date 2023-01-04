@@ -1,8 +1,14 @@
+.html {
+  height: 100%;
+  width: auto;
+}
+
 .body {
   background-color: darkgray;
   margin-left: 2.5rem;
   margin-right: 2.5rem;
   margin-top: 1.5rem;
+  height: 100%;
 }
 
 .control {
