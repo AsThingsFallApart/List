@@ -220,7 +220,7 @@ function handleDrop(event) {
   console.log(event);
 
   // TODO: check if dataTransfer object has a format 'applciation/x-moz-node'
-  if (true) {
+  if (placeholderExists) {
     let listBody = document.getElementsByClassName('listBody')[0];
     let newListRow;
 
