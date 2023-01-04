@@ -10,6 +10,7 @@ Features:
 - Add text to rows by typing text into the input box before pressing "Create Row"
 - Each row has an indicator: click on red to turn to green and vice versa
 - Doubleclick on a row's text to change it
+- Drag/drop rows to rearrange the list
 
 Useful for easily visualizing two-state collections.
 
