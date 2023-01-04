@@ -89,109 +89,124 @@ function handlePlaceholderPositioning(event) {
   let rowOffsetYBottomFourth = currentRow.offsetHeight / 4;
   let rowOffsetYTopFourth = currentRow.offsetHeight - rowOffsetYBottomFourth;
 
-  if (event.offsetY > rowOffsetYTopFourth) {
-    // position placeholder below the row
-    let newPlaceholderTopNeighborIndex = currentRowIndex;
-    let newPlaceholderBottomNeighborIndex = currentRowIndex + 2;
-    console.log(`\tIn the lower half of element ${currentRowIndex}`);
-    console.log(`\tPlacing placeholder below current row...`);
-    console.log(`\tyThreshold: ${rowOffsetYTopFourth}`);
-    console.log(`\tevent.offsetY: ${event.offsetY}`);
-    console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
-    console.log('\tCurrent placeholder pair:');
-    console.log(
-      `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
-    );
-    console.log(
-      `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
-    );
-    console.log('\tProposed placeholder pair:');
-    console.log(
-      `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
-    );
-    console.log(
-      `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
-    );
-
+  if (
+    currentRowIndex + 1 != bottomNeighborIndex ||
+    currentRowIndex - 1 != topNeighborIndex
+  ) {
     if (
-      newPlaceholderBottomNeighborIndex != oldPlaceholderBottomNeighborIndex ||
-      newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
+      event.offsetY > rowOffsetYTopFourth &&
+      currentRowIndex != topNeighborIndex
     ) {
-      if (placeholderRowIndex != undefined) {
-        console.log(
-          `\tNumber of available rows: ${listBody.childElementCount}`
-        );
-        console.log(
-          `\tTrying to delete placeholder from index ${placeholderRowIndex}...`
-        );
-        if (placeholderRowIndex == listBody.childElementCount) {
-          // delete last row
-          console.log(
-            `Placeholder is at the end of the list: deleting last row.`
-          );
-          listBody.deleteRow(-1);
-        } else {
-          console.log(`Deleting row at index ${placeholderRowIndex}`);
-          listBody.deleteRow(placeholderRowIndex);
-        }
-      }
-      console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
-      initPlaceholder(currentRowIndex + 1);
-      placeholderRowIndex = currentRowIndex + 1;
-      oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
-      oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
-      placeholderExists = true;
-    }
-  } else if (event.offsetY < rowOffsetYBottomFourth) {
-    // position placeholder above the row
-    let newPlaceholderTopNeighborIndex = currentRowIndex - 2;
-    let newPlaceholderBottomNeighborIndex = currentRowIndex;
-    console.log(`\tIn the upper half of element ${currentRowIndex}`);
-    console.log(`\tPlacing placeholder above current row...`);
-    console.log(`\tyThreshold: ${rowOffsetYBottomFourth}`);
-    console.log(`\tevent.offsetY: ${event.offsetY}`);
-    console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
-    console.log('\tCurrent placeholder pair:');
-    console.log(
-      `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
-    );
-    console.log(
-      `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
-    );
-    console.log('\tProposed placeholder pair:');
-    console.log(
-      `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
-    );
-    console.log(
-      `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
-    );
+      // position placeholder below the row
+      let newPlaceholderTopNeighborIndex = currentRowIndex;
+      let newPlaceholderBottomNeighborIndex = currentRowIndex + 2;
+      console.log(`\tIn the lower half of element ${currentRowIndex}`);
+      console.log(`\tPlacing placeholder below current row...`);
+      console.log(`\tyThreshold: ${rowOffsetYTopFourth}`);
+      console.log(`\tevent.offsetY: ${event.offsetY}`);
+      console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
+      console.log('\tCurrent placeholder pair:');
+      console.log(
+        `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+      );
+      console.log(
+        `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+      );
+      console.log('\tProposed placeholder pair:');
+      console.log(
+        `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
+      );
+      console.log(
+        `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+      );
 
-    if (
-      newPlaceholderBottomNeighborIndex != oldPlaceholderBottomNeighborIndex ||
-      newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
-    ) {
-      console.log(`Positioning placeholder at ${currentRowIndex}...`);
-      if (placeholderRowIndex != undefined) {
-        console.log(`Number of available rows: ${listBody.childElementCount}`);
-        console.log(
-          `Trying to delete placeholder from index ${placeholderRowIndex}...`
-        );
-        if (placeholderRowIndex == listBody.childElementCount) {
-          // delete last row in list
+      if (
+        newPlaceholderBottomNeighborIndex !=
+          oldPlaceholderBottomNeighborIndex ||
+        newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
+      ) {
+        if (placeholderRowIndex != undefined) {
           console.log(
-            `Available rows = placeholder index. Deleting last row...`
+            `\tNumber of available rows: ${listBody.childElementCount}`
           );
-          listBody.deleteRow(-1);
-        } else {
-          console.log(`Deleting row at index ${placeholderRowIndex}...`);
-          listBody.deleteRow(placeholderRowIndex);
+          console.log(
+            `\tTrying to delete placeholder from index ${placeholderRowIndex}...`
+          );
+          if (placeholderRowIndex == listBody.childElementCount) {
+            // delete last row
+            console.log(
+              `Placeholder is at the end of the list: deleting last row.`
+            );
+            listBody.deleteRow(-1);
+          } else {
+            console.log(`Deleting row at index ${placeholderRowIndex}`);
+            listBody.deleteRow(placeholderRowIndex);
+          }
         }
+        console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
+        initPlaceholder(currentRowIndex + 1);
+        placeholderRowIndex = currentRowIndex + 1;
+        oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
+        oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+        placeholderExists = true;
       }
-      initPlaceholder(currentRowIndex);
-      placeholderRowIndex = currentRowIndex;
-      oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
-      oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
-      placeholderExists = true;
+    } else if (
+      event.offsetY < rowOffsetYBottomFourth &&
+      currentRowIndex != bottomNeighborIndex
+    ) {
+      // position placeholder above the row
+      let newPlaceholderTopNeighborIndex = currentRowIndex - 2;
+      let newPlaceholderBottomNeighborIndex = currentRowIndex;
+      console.log(`\tIn the upper half of element ${currentRowIndex}`);
+      console.log(`\tPlacing placeholder above current row...`);
+      console.log(`\tyThreshold: ${rowOffsetYBottomFourth}`);
+      console.log(`\tevent.offsetY: ${event.offsetY}`);
+      console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
+      console.log('\tCurrent placeholder pair:');
+      console.log(
+        `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+      );
+      console.log(
+        `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+      );
+      console.log('\tProposed placeholder pair:');
+      console.log(
+        `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
+      );
+      console.log(
+        `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+      );
+
+      if (
+        newPlaceholderBottomNeighborIndex !=
+          oldPlaceholderBottomNeighborIndex ||
+        newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
+      ) {
+        console.log(`Positioning placeholder at ${currentRowIndex}...`);
+        if (placeholderRowIndex != undefined) {
+          console.log(
+            `Number of available rows: ${listBody.childElementCount}`
+          );
+          console.log(
+            `Trying to delete placeholder from index ${placeholderRowIndex}...`
+          );
+          if (placeholderRowIndex == listBody.childElementCount) {
+            // delete last row in list
+            console.log(
+              `Available rows = placeholder index. Deleting last row...`
+            );
+            listBody.deleteRow(-1);
+          } else {
+            console.log(`Deleting row at index ${placeholderRowIndex}...`);
+            listBody.deleteRow(placeholderRowIndex);
+          }
+        }
+        initPlaceholder(currentRowIndex);
+        placeholderRowIndex = currentRowIndex;
+        oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
+        oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+        placeholderExists = true;
+      }
     }
   }
 }
@@ -219,7 +234,6 @@ function handleDrop(event) {
   console.log('The event:');
   console.log(event);
 
-  // TODO: check if dataTransfer object has a format 'applciation/x-moz-node'
   if (placeholderExists) {
     let listBody = document.getElementsByClassName('listBody')[0];
     let newListRow;
