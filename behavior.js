@@ -2,8 +2,6 @@ const crimson = 'rgb(220, 20, 60)';
 const forestgreen = 'rgb(34, 139, 34)';
 
 let defaultColor = crimson;
-let isDragging = false;
-let dragOrigin = 0;
 let placeholderExists = false;
 let placeholderRowIndex = undefined;
 let oldPlaceholderTopNeighborIndex = 0;
@@ -20,6 +18,32 @@ entireDocument.addEventListener('dragenter', preventDefaultBehavior);
 entireDocument.addEventListener('dragover', preventDefaultBehavior);
 entireDocument.addEventListener('drop', handleDrop);
 
+handleRowCreation(1);
+handleRowCreation(2);
+handleRowCreation(3);
+handleRowCreation(4);
+handleRowCreation(5);
+
+/* ========================================= FUNCTIONS ============================================= */
+function handleDisplayingRowControl(event) {
+  let currentRow = event.target.parentNode;
+  console.dir(currentRow);
+  let rightmostChild = currentRow.lastChild;
+  let cursorXPos = event.offsetX;
+
+  let cursorXPercentile = cursorXPos / rightmostChild.offsetWidth;
+
+  console.log(`Rightmost element: ${rightmostChild}`);
+  console.log(`The cursor is at x-coord: ${cursorXPos}`);
+  console.log(`The cursor in the top ${cursorXPercentile * 100}% of the row.`);
+
+  if ((event.target = rightmostChild)) {
+    if (cursorXPercentile >= 0.95) {
+      // display row control
+    }
+  }
+}
+
 function preventDefaultBehavior(event) {
   event.preventDefault();
 }
@@ -33,8 +57,6 @@ function initPlaceholder(insertionIndex) {
 
   let listRowDescriptorPlaceholder = document.createElement('td');
   listRowDescriptorPlaceholder.classList = 'listRowDescriptorPlaceholder';
-
-  console.dir(listBody);
 
   if (insertionIndex < listBody.childElementCount) {
     newListRowPlaceholder = listBody.insertRow(insertionIndex);
@@ -61,63 +83,121 @@ function initPlaceholder(insertionIndex) {
   newListRowPlaceholder.addEventListener('drop', handleDrop);
 }
 
+/* ROW SEMANTICS:
+ *
+ * minYOffset
+ *  |
+ *  | ------------------------------------
+ *  | |                                  | <-- "lower activation area" (lower 25% offsetY values)
+ *  | |       {col1, col2.. coln}        | <-- "middle"                (deadzone, no behavior)
+ *  | |                                  | <-- "upper activation area" (upper 25% offsetY values)
+ *  | ------------------------------------
+ *  |
+ *  V
+ * maxYOffset
+ *
+ */
+
 function handlePlaceholderPositioning(event) {
   event.preventDefault();
   // console.log(`The cursor is at ${event.offsetX}, ${event.offsetY}.`);
+  let pointerYPos = event.offsetY;
   let currentRow = event.target.parentNode;
   let listBody = document.getElementsByClassName('listBody')[0];
+  let draggedRow = document.getElementById('dragged');
   let currentRowIndex = Array.prototype.indexOf.call(
     listBody.childNodes,
     currentRow
   );
-  let topNeighborIndex = dragOrigin - 1;
-  let bottomNeighborIndex = dragOrigin + 1;
-  console.log(`dragOrigin: ${dragOrigin}`);
-  console.log(`topNeighborIndex: ${topNeighborIndex}`);
-  console.log(`bottomNeightborIndex: ${bottomNeighborIndex}`);
-  console.log(`currentRowIndex: ${currentRowIndex}`);
+  let draggedRowIndex = Array.prototype.indexOf.call(
+    listBody.childNodes,
+    draggedRow
+  );
+  let topNeighborIndex = draggedRowIndex - 1;
+  let bottomNeighborIndex = draggedRowIndex + 1;
+
+  console.log(`\nThis list has ${listBody.childElementCount} rows.`);
+
+  let listRows = listBody.rows;
+  console.log('\t-----------------');
+  for (let i = 0; i < listBody.childElementCount; i++) {
+    if (listRows[i].classList == 'listRowPlaceholder') {
+      console.log(`${i}:\t|\tplaceholder\t|`);
+    } else {
+      console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
+    }
+  }
+  console.log('\t-----------------');
+
   console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
+  console.log(`currentRowIndex: ${currentRowIndex}`);
+  console.log(`draggedRowIndex: ${draggedRowIndex}`);
+  console.log(`topNeighborIndex: ${topNeighborIndex}`);
+  console.log(`bottomNeighborIndex: ${bottomNeighborIndex}`);
 
   if (currentRowIndex == topNeighborIndex) {
-    console.log(`This element ${currentRowIndex} is the top neighbor.`);
+    console.log(
+      `Row at index ${currentRowIndex} is the top neighbor:\n\tBottom activation area disabled.`
+    );
   }
 
   if (currentRowIndex == bottomNeighborIndex) {
-    console.log(`This element ${currentRowIndex} is the bottom neighbor.`);
+    console.log(
+      `Row at index ${currentRowIndex} is the bottom neighbor:\n\tTop activation are disabled.`
+    );
   }
 
-  let rowOffsetYBottomFourth = currentRow.offsetHeight / 4;
-  let rowOffsetYTopFourth = currentRow.offsetHeight - rowOffsetYBottomFourth;
+  let rowLowerYThreshold = currentRow.offsetHeight / 4;
+  let rowUpperYThreshold = currentRow.offsetHeight - rowLowerYThreshold;
 
+  // block placeholder positioning if dragging over the original dragged row
   if (
     currentRowIndex + 1 != bottomNeighborIndex ||
     currentRowIndex - 1 != topNeighborIndex
   ) {
+    console.log('\tNot-dragged-row check passed.');
+    console.log(
+      `\t{currentRowIndex + 1 != bottomNeighborIndex}: ${
+        currentRowIndex + 1
+      } != ${bottomNeighborIndex}`
+    );
+    console.log(
+      `\t{currentRowIndex - 1 != topNeighborIndex}: ${
+        currentRowIndex - 1
+      } != ${topNeighborIndex}`
+    );
+    // position placeholder row after the dragged over row
     if (
-      event.offsetY > rowOffsetYTopFourth &&
+      pointerYPos >= rowUpperYThreshold &&
       currentRowIndex != topNeighborIndex
     ) {
-      // position placeholder below the row
-      let newPlaceholderTopNeighborIndex = currentRowIndex;
+      console.log('\t\tUpper pointer position check passed.');
+      console.log(
+        `\t\tIn the upper activation area of row at index ${currentRowIndex}:`
+      );
+      console.log(
+        `\t\t\t{cursorY >= rowUpperYThreshold}: ${pointerYPos} >= ${rowUpperYThreshold}`
+      );
+      console.log(
+        `\t\tProposing to position placeholder at index ${
+          currentRowIndex + 1
+        }...`
+      );
       let newPlaceholderBottomNeighborIndex = currentRowIndex + 2;
-      console.log(`\tIn the lower half of element ${currentRowIndex}`);
-      console.log(`\tPlacing placeholder below current row...`);
-      console.log(`\tyThreshold: ${rowOffsetYTopFourth}`);
-      console.log(`\tevent.offsetY: ${event.offsetY}`);
-      console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
-      console.log('\tCurrent placeholder pair:');
+      let newPlaceholderTopNeighborIndex = currentRowIndex;
+      console.log('\t\tCurrent placeholder pair:');
       console.log(
-        `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+        `\t\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
       );
       console.log(
-        `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+        `\t\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
       );
-      console.log('\tProposed placeholder pair:');
+      console.log('\t\tProposed placeholder pair:');
       console.log(
-        `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
+        `\t\t\tnewPlaceholderBottomNeighborIndex: ${newPlaceholderBottomNeighborIndex}`
       );
       console.log(
-        `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+        `\t\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
       );
 
       if (
@@ -125,56 +205,69 @@ function handlePlaceholderPositioning(event) {
           oldPlaceholderBottomNeighborIndex ||
         newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
       ) {
+        console.log('\t\t\tNew placeholder node pair check passed.');
+        /* Delete existing placeholder row before inserting a new one */
+        //  Consider encapsulating this conceptually unique functionality into a seperate function...
         if (placeholderRowIndex != undefined) {
+          console.log('\t\t\t\tDeleting old placeholder:');
           console.log(
-            `\tNumber of available rows: ${listBody.childElementCount}`
+            `\t\t\t\t\tNumber of available rows: ${listBody.childElementCount}`
           );
           console.log(
-            `\tTrying to delete placeholder from index ${placeholderRowIndex}...`
+            `\t\t\t\t\tTrying to delete placeholder from index ${placeholderRowIndex}...`
           );
           if (placeholderRowIndex == listBody.childElementCount) {
             // delete last row
             console.log(
-              `Placeholder is at the end of the list: deleting last row.`
+              `\t\t\t\t\tPlaceholder is at the end of the list: deleting last row.`
             );
             listBody.deleteRow(-1);
           } else {
-            console.log(`Deleting row at index ${placeholderRowIndex}`);
+            console.log(
+              `\t\t\t\t\tDeleting row at index ${placeholderRowIndex}.`
+            );
             listBody.deleteRow(placeholderRowIndex);
           }
         }
-        console.log(`Positioning placeholder at ${currentRowIndex + 1}...`);
+        console.log(
+          `\t\t\tPositioning placeholder at index ${currentRowIndex + 1}...`
+        );
         initPlaceholder(currentRowIndex + 1);
         placeholderRowIndex = currentRowIndex + 1;
         oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
         oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
         placeholderExists = true;
       }
+      // position placeholder row before dragged over row
     } else if (
-      event.offsetY < rowOffsetYBottomFourth &&
+      pointerYPos <= rowLowerYThreshold &&
       currentRowIndex != bottomNeighborIndex
     ) {
-      // position placeholder above the row
-      let newPlaceholderTopNeighborIndex = currentRowIndex - 2;
+      console.log('\t\tLower pointer positioning check passed.');
+      console.log(
+        `\t\tIn the lower activation area of row at index ${currentRowIndex}:`
+      );
+      console.log(
+        `\t\t\t{cursorY <= elementYThreshold}: ${pointerYPos} <= ${rowLowerYThreshold}`
+      );
+      console.log(
+        `\t\tProposing to position placeholder at index ${currentRowIndex}...`
+      );
       let newPlaceholderBottomNeighborIndex = currentRowIndex;
-      console.log(`\tIn the upper half of element ${currentRowIndex}`);
-      console.log(`\tPlacing placeholder above current row...`);
-      console.log(`\tyThreshold: ${rowOffsetYBottomFourth}`);
-      console.log(`\tevent.offsetY: ${event.offsetY}`);
-      console.log(`\tcurrentRowIndex: ${currentRowIndex}`);
-      console.log('\tCurrent placeholder pair:');
+      let newPlaceholderTopNeighborIndex = currentRowIndex - 2;
+      console.log('\t\tCurrent placeholder pair:');
       console.log(
-        `\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+        `\t\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
       );
       console.log(
-        `\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+        `\t\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
       );
-      console.log('\tProposed placeholder pair:');
+      console.log('\t\tProposed placeholder pair:');
       console.log(
-        `\t\tnewPlaceholderBottomNeighborIndex ${newPlaceholderBottomNeighborIndex}`
+        `\t\t\tnewPlaceholderBottomNeighborIndex: ${newPlaceholderBottomNeighborIndex}`
       );
       console.log(
-        `\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+        `\t\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
       );
 
       if (
@@ -182,25 +275,31 @@ function handlePlaceholderPositioning(event) {
           oldPlaceholderBottomNeighborIndex ||
         newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
       ) {
-        console.log(`Positioning placeholder at ${currentRowIndex}...`);
+        console.log('\t\t\tNew placeholder node pair check passed.');
         if (placeholderRowIndex != undefined) {
+          console.log(`\t\t\t\tDeleting old placeholder:`);
           console.log(
-            `Number of available rows: ${listBody.childElementCount}`
+            `\t\t\t\t\tNumber of available rows: ${listBody.childElementCount}`
           );
           console.log(
-            `Trying to delete placeholder from index ${placeholderRowIndex}...`
+            `\t\t\t\t\tTrying to delete placeholder from index ${placeholderRowIndex}...`
           );
           if (placeholderRowIndex == listBody.childElementCount) {
             // delete last row in list
             console.log(
-              `Available rows = placeholder index. Deleting last row...`
+              `\t\t\t\t\tAvailable rows = placeholder index. Deleting last row...`
             );
             listBody.deleteRow(-1);
           } else {
-            console.log(`Deleting row at index ${placeholderRowIndex}...`);
+            console.log(
+              `\t\t\t\t\tDeleting row at index ${placeholderRowIndex}...`
+            );
             listBody.deleteRow(placeholderRowIndex);
           }
         }
+        console.log(
+          `\t\t\tPositioning placeholder at index ${currentRowIndex}...`
+        );
         initPlaceholder(currentRowIndex);
         placeholderRowIndex = currentRowIndex;
         oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
@@ -222,6 +321,8 @@ function handleClick(event) {
 
 function handleDrop(event) {
   event.preventDefault();
+  let draggedRow = document.getElementById('dragged');
+
   console.log('dropped');
   console.log(`event.target.classList: ${event.target.classList}`);
   console.log(
@@ -243,7 +344,10 @@ function handleDrop(event) {
     );
     console.log(`draggedRowInnerHTML: ${draggedRowInnerHTML}`);
 
-    let draggedRowIndex = event.dataTransfer.getData('index');
+    let draggedRowIndex = Array.prototype.indexOf.call(
+      listBody.childNodes,
+      draggedRow
+    );
     console.log(`draggedRowIndex: ${draggedRowIndex}`);
 
     if (placeholderRowIndex > listBody.childElementCount) {
@@ -275,6 +379,8 @@ function handleDrop(event) {
     addBehaviorToRowChildren(newListRow);
   }
 
+  draggedRow.id = '';
+
   placeholderRowIndex = undefined;
   placeholderExists = false;
 
@@ -285,8 +391,6 @@ function handleDrop(event) {
 function handleDragStart(event) {
   let draggedRow = event.target.parentNode;
 
-  console.log(`isDragging: ${isDragging}`);
-
   event.dataTransfer.setDragImage(draggedRow, 0, 0);
   event.dataTransfer.effectAllowed = 'move';
 
@@ -296,16 +400,7 @@ function handleDragStart(event) {
   );
   event.dataTransfer.setData('text/plain', draggedRow.textContent);
 
-  let listBody = draggedRow.parentNode;
-
-  console.log(draggedRow);
-
-  let draggedRowIndex = Array.prototype.indexOf.call(
-    listBody.childNodes,
-    draggedRow
-  );
-  event.dataTransfer.setData('index', draggedRowIndex);
-  dragOrigin = draggedRowIndex;
+  draggedRow.id = 'dragged';
 }
 
 function handleTextSubstitution(event) {
@@ -325,15 +420,26 @@ function handleTextSubstitution(event) {
 }
 
 function handleRowDeletion(event) {
+  //   console.log('Substitutor element:');
+  //   console.log(event.target);
+  //   console.log('listRow Element:');
+  //   console.log(event.target.parentNode);
+  //   console.log('listBody element: ');
+  //   console.log(event.target.parentNode.parentNode);
+  //   console.log('list element:');
+  //   console.log(event.target.parentNode.parentNode.parentNode);
+  //   console.log('div element:');
+  //   console.log(event.target.parentNode.parentNode.parentNode.parentNode);
   let listRowSubstitutorContent = event.target.value;
 
   if (event.key == 'Enter' && listRowSubstitutorContent == '') {
     event.target.removeEventListener('blur', handleRowDeletion);
 
-    let listRow = event.target.parentNode;
-    let list = event.target.parentNode.parentNode;
+    let rowWithEmptyDescriptor = event.target.parentNode;
+    let listBody = event.target.parentNode.parentNode;
+    let list = event.target.parentNode.parentNode.parentNode;
 
-    list.removeChild(listRow);
+    listBody.removeChild(rowWithEmptyDescriptor);
 
     if (list.childNodes.length == 0) {
       list.parentNode.removeChild(list);
@@ -341,19 +447,21 @@ function handleRowDeletion(event) {
   } else if (event.key == 'Escape' && listRowSubstitutorContent == '') {
     event.target.removeEventListener('blur', handleRowDeletion);
 
-    let listRow = event.target.parentNode;
-    let list = event.target.parentNode.parentNode;
+    let rowWithEmptyDescriptor = event.target.parentNode;
+    let listBody = event.target.parentNode.parentNode;
+    let list = event.target.parentNode.parentNode.parentNode;
 
-    list.removeChild(listRow);
+    listBody.removeChild(rowWithEmptyDescriptor);
 
     if (list.childNodes.length == 0) {
       list.parentNode.removeChild(list);
     }
   } else if (event.type == 'blur' && listRowSubstitutorContent == '') {
-    let listRow = event.target.parentNode;
-    let list = event.target.parentNode.parentNode;
+    let rowWithEmptyDescriptor = event.target.parentNode;
+    let listBody = event.target.parentNode.parentNode;
+    let list = event.target.parentNode.parentNode.parentNode;
 
-    list.removeChild(listRow);
+    listBody.removeChild(rowWithEmptyDescriptor);
 
     if (list.childNodes.length == 0) {
       list.parentNode.removeChild(list);
@@ -429,24 +537,6 @@ function addBehaviorToRowChildren(HTMLListRow) {
   }
 }
 
-function initListRow(newListRow) {
-  let listRowIndicator = document.createElement('td');
-  listRowIndicator.classList.add('listRowIndicator');
-  listRowIndicator.style.backgroundColor = defaultColor;
-
-  let listRowDescriptor = document.createElement('td');
-  listRowDescriptor.classList.add('listRowDescriptor');
-  listRowDescriptor.textContent = document.getElementById('inputBox').value;
-
-  newListRow.classList.add('listRow');
-  newListRow.appendChild(listRowIndicator);
-  newListRow.appendChild(listRowDescriptor);
-  newListRow.addEventListener('click', handleClick);
-  newListRow.addEventListener('dragover', handlePlaceholderPositioning);
-
-  addBehaviorToRowChildren(newListRow);
-}
-
 function initList() {
   let newList = document.createElement('table');
 
@@ -459,7 +549,32 @@ function initList() {
   return newList;
 }
 
-function handleRowCreation() {
+function initListRow(newListRow, rowContent = '') {
+  let listRowIndicator = document.createElement('td');
+  listRowIndicator.classList.add('listRowIndicator');
+  listRowIndicator.style.backgroundColor = defaultColor;
+
+  let listRowDescriptor = document.createElement('td');
+  listRowDescriptor.classList.add('listRowDescriptor');
+  if (rowContent != '') {
+    listRowDescriptor.textContent = rowContent;
+  } else {
+    listRowDescriptor.textContent = document.getElementById('inputBox').value;
+  }
+
+  let listRowControl = document.createElement('td');
+  listRowControl.classList = 'listRowControl';
+
+  newListRow.classList.add('listRow');
+  newListRow.appendChild(listRowIndicator);
+  newListRow.appendChild(listRowDescriptor);
+  newListRow.addEventListener('click', handleClick);
+  newListRow.addEventListener('dragover', handlePlaceholderPositioning);
+
+  addBehaviorToRowChildren(newListRow);
+}
+
+function handleRowCreation(rowContent = '') {
   let list;
 
   if (document.getElementById('list') == undefined) {
@@ -472,5 +587,10 @@ function handleRowCreation() {
   }
 
   let newListRow = list.insertRow(-1);
-  initListRow(newListRow);
+
+  if (rowContent != '') {
+    initListRow(newListRow, rowContent);
+  } else {
+    initListRow(newListRow);
+  }
 }
