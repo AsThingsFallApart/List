@@ -4,8 +4,8 @@ const forestgreen = 'rgb(34, 139, 34)';
 let defaultColor = crimson;
 let placeholderExists = false;
 let placeholderRowIndex = undefined;
-let oldPlaceholderTopNeighborIndex = 0;
-let oldPlaceholderBottomNeighborIndex = 0;
+let oldPlaceholderPredecessorIndex = 0;
+let oldPlaceholderSuccessorIndex = 0;
 
 let rowCreator = document.getElementById('creator');
 rowCreator.addEventListener('click', handleRowCreation);
@@ -113,10 +113,10 @@ function handlePlaceholderPositioning(event) {
     listBody.childNodes,
     draggedRow
   );
-  let topNeighborIndex = draggedRowIndex - 1;
-  let bottomNeighborIndex = draggedRowIndex + 1;
+  let predecessorIndex = draggedRowIndex - 1;
+  let successorIndex = draggedRowIndex + 1;
 
-  console.log(`\nThis list has ${listBody.childElementCount} rows.`);
+  console.log(`\nThis list has ${listBody.childElementCount} rows:`);
 
   let listRows = listBody.rows;
   console.log('\t-----------------');
@@ -132,18 +132,18 @@ function handlePlaceholderPositioning(event) {
   console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
   console.log(`currentRowIndex: ${currentRowIndex}`);
   console.log(`draggedRowIndex: ${draggedRowIndex}`);
-  console.log(`topNeighborIndex: ${topNeighborIndex}`);
-  console.log(`bottomNeighborIndex: ${bottomNeighborIndex}`);
+  console.log(`predecessorIndex: ${predecessorIndex}`);
+  console.log(`successorIndex: ${successorIndex}`);
 
-  if (currentRowIndex == topNeighborIndex) {
+  if (currentRowIndex == predecessorIndex) {
     console.log(
-      `Row at index ${currentRowIndex} is the top neighbor:\n\tBottom activation area disabled.`
+      `Row at index ${currentRowIndex} is the predecessor:\n\tIt's upper activation area is disabled.`
     );
   }
 
-  if (currentRowIndex == bottomNeighborIndex) {
+  if (currentRowIndex == successorIndex) {
     console.log(
-      `Row at index ${currentRowIndex} is the bottom neighbor:\n\tTop activation are disabled.`
+      `Row at index ${currentRowIndex} is the successor:\n\tIt's lower activation are disabled.`
     );
   }
 
@@ -152,24 +152,24 @@ function handlePlaceholderPositioning(event) {
 
   // block placeholder positioning if dragging over the original dragged row
   if (
-    currentRowIndex + 1 != bottomNeighborIndex ||
-    currentRowIndex - 1 != topNeighborIndex
+    currentRowIndex + 1 != successorIndex ||
+    currentRowIndex - 1 != predecessorIndex
   ) {
     console.log('\tNot-dragged-row check passed.');
     console.log(
-      `\t{currentRowIndex + 1 != bottomNeighborIndex}: ${
+      `\t{currentRowIndex + 1 != successorIndex}: ${
         currentRowIndex + 1
-      } != ${bottomNeighborIndex}`
+      } != ${successorIndex}`
     );
     console.log(
-      `\t{currentRowIndex - 1 != topNeighborIndex}: ${
+      `\t{currentRowIndex - 1 != predecessorIndex}: ${
         currentRowIndex - 1
-      } != ${topNeighborIndex}`
+      } != ${predecessorIndex}`
     );
     // position placeholder row after the dragged over row
     if (
       pointerYPos >= rowUpperYThreshold &&
-      currentRowIndex != topNeighborIndex
+      currentRowIndex != predecessorIndex
     ) {
       console.log('\t\tUpper pointer position check passed.');
       console.log(
@@ -183,27 +183,26 @@ function handlePlaceholderPositioning(event) {
           currentRowIndex + 1
         }...`
       );
-      let newPlaceholderBottomNeighborIndex = currentRowIndex + 2;
-      let newPlaceholderTopNeighborIndex = currentRowIndex;
+      let newPlaceholderSuccessorIndex = currentRowIndex + 2;
+      let newPlaceholderPredecessorIndex = currentRowIndex;
       console.log('\t\tCurrent placeholder pair:');
       console.log(
-        `\t\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+        `\t\t\toldPlaceholderSuccessorIndex: ${oldPlaceholderSuccessorIndex}`
       );
       console.log(
-        `\t\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+        `\t\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderPredecessorIndex}`
       );
       console.log('\t\tProposed placeholder pair:');
       console.log(
-        `\t\t\tnewPlaceholderBottomNeighborIndex: ${newPlaceholderBottomNeighborIndex}`
+        `\t\t\tnewPlaceholderSuccessorIndex: ${newPlaceholderSuccessorIndex}`
       );
       console.log(
-        `\t\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+        `\t\t\tnewPlaceholderPredecessorIndex: ${newPlaceholderPredecessorIndex}`
       );
 
       if (
-        newPlaceholderBottomNeighborIndex !=
-          oldPlaceholderBottomNeighborIndex ||
-        newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
+        newPlaceholderSuccessorIndex != oldPlaceholderSuccessorIndex ||
+        newPlaceholderPredecessorIndex != oldPlaceholderPredecessorIndex
       ) {
         console.log('\t\t\tNew placeholder node pair check passed.');
         /* Delete existing placeholder row before inserting a new one */
@@ -234,14 +233,14 @@ function handlePlaceholderPositioning(event) {
         );
         initPlaceholder(currentRowIndex + 1);
         placeholderRowIndex = currentRowIndex + 1;
-        oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
-        oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+        oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
+        oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
         placeholderExists = true;
       }
       // position placeholder row before dragged over row
     } else if (
       pointerYPos <= rowLowerYThreshold &&
-      currentRowIndex != bottomNeighborIndex
+      currentRowIndex != successorIndex
     ) {
       console.log('\t\tLower pointer positioning check passed.');
       console.log(
@@ -253,27 +252,26 @@ function handlePlaceholderPositioning(event) {
       console.log(
         `\t\tProposing to position placeholder at index ${currentRowIndex}...`
       );
-      let newPlaceholderBottomNeighborIndex = currentRowIndex;
-      let newPlaceholderTopNeighborIndex = currentRowIndex - 2;
+      let newPlaceholderSuccessorIndex = currentRowIndex;
+      let newPlaceholderPredecessorIndex = currentRowIndex - 2;
       console.log('\t\tCurrent placeholder pair:');
       console.log(
-        `\t\t\toldPlaceholderBottomNeighborIndex: ${oldPlaceholderBottomNeighborIndex}`
+        `\t\t\toldPlaceholderSuccessorIndex: ${oldPlaceholderSuccessorIndex}`
       );
       console.log(
-        `\t\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderTopNeighborIndex}`
+        `\t\t\toldPlaceholderPredecessorIndex: ${oldPlaceholderPredecessorIndex}`
       );
       console.log('\t\tProposed placeholder pair:');
       console.log(
-        `\t\t\tnewPlaceholderBottomNeighborIndex: ${newPlaceholderBottomNeighborIndex}`
+        `\t\t\tnewPlaceholderSuccessorIndex: ${newPlaceholderSuccessorIndex}`
       );
       console.log(
-        `\t\t\tnewPlaceholderTopNeightborIndex: ${newPlaceholderTopNeighborIndex}`
+        `\t\t\tnewPlaceholderPredecessorIndex: ${newPlaceholderPredecessorIndex}`
       );
 
       if (
-        newPlaceholderBottomNeighborIndex !=
-          oldPlaceholderBottomNeighborIndex ||
-        newPlaceholderTopNeighborIndex != oldPlaceholderTopNeighborIndex
+        newPlaceholderSuccessorIndex != oldPlaceholderSuccessorIndex ||
+        newPlaceholderPredecessorIndex != oldPlaceholderPredecessorIndex
       ) {
         console.log('\t\t\tNew placeholder node pair check passed.');
         if (placeholderRowIndex != undefined) {
@@ -302,8 +300,8 @@ function handlePlaceholderPositioning(event) {
         );
         initPlaceholder(currentRowIndex);
         placeholderRowIndex = currentRowIndex;
-        oldPlaceholderTopNeighborIndex = newPlaceholderTopNeighborIndex;
-        oldPlaceholderBottomNeighborIndex = newPlaceholderBottomNeighborIndex;
+        oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
+        oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
         placeholderExists = true;
       }
     }
