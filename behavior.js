@@ -25,24 +25,24 @@ handleRowCreation(4);
 handleRowCreation(5);
 
 /* ========================================= FUNCTIONS ============================================= */
-function handleDisplayingRowControl(event) {
-  let currentRow = event.target.parentNode;
-  console.dir(currentRow);
-  let rightmostChild = currentRow.lastChild;
-  let cursorXPos = event.offsetX;
+// function handleDisplayingRowControl(event) {
+//   let currentRow = event.target.parentNode;
+//   console.dir(currentRow);
+//   let rightmostChild = currentRow.lastChild;
+//   let cursorXPos = event.offsetX;
 
-  let cursorXPercentile = cursorXPos / rightmostChild.offsetWidth;
+//   let cursorXPercentile = cursorXPos / rightmostChild.offsetWidth;
 
-  console.log(`Rightmost element: ${rightmostChild}`);
-  console.log(`The cursor is at x-coord: ${cursorXPos}`);
-  console.log(`The cursor in the top ${cursorXPercentile * 100}% of the row.`);
+//   console.log(`Rightmost element: ${rightmostChild}`);
+//   console.log(`The cursor is at x-coord: ${cursorXPos}`);
+//   console.log(`The cursor in the top ${cursorXPercentile * 100}% of the row.`);
 
-  if ((event.target = rightmostChild)) {
-    if (cursorXPercentile >= 0.95) {
-      // display row control
-    }
-  }
-}
+//   if ((event.target = rightmostChild)) {
+//     if (cursorXPercentile >= 0.95) {
+//       // display row control
+//     }
+//   }
+// }
 
 function preventDefaultBehavior(event) {
   event.preventDefault();
@@ -102,12 +102,12 @@ function handlePlaceholderPositioning(event) {
   event.preventDefault();
   // console.log(`The cursor is at ${event.offsetX}, ${event.offsetY}.`);
   let pointerYPos = event.offsetY;
-  let currentRow = event.target.parentNode;
   let listBody = document.getElementsByClassName('listBody')[0];
   let draggedRow = document.getElementById('dragged');
-  let currentRowIndex = Array.prototype.indexOf.call(
+  let draggedoverRow = event.target.parentNode;
+  let draggedoverRowIndex = Array.prototype.indexOf.call(
     listBody.childNodes,
-    currentRow
+    draggedoverRow
   );
   let draggedRowIndex = Array.prototype.indexOf.call(
     listBody.childNodes,
@@ -130,61 +130,61 @@ function handlePlaceholderPositioning(event) {
   console.log('\t-----------------');
 
   console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
-  console.log(`currentRowIndex: ${currentRowIndex}`);
+  console.log(`draggedoverRowIndex: ${draggedoverRowIndex}`);
   console.log(`draggedRowIndex: ${draggedRowIndex}`);
   console.log(`predecessorIndex: ${predecessorIndex}`);
   console.log(`successorIndex: ${successorIndex}`);
 
-  if (currentRowIndex == predecessorIndex) {
+  if (draggedoverRowIndex == predecessorIndex) {
     console.log(
-      `Row at index ${currentRowIndex} is the predecessor:\n\tIt's upper activation area is disabled.`
+      `Row at index ${draggedoverRowIndex} is the predecessor:\n\tIt's upper activation area is disabled.`
     );
   }
 
-  if (currentRowIndex == successorIndex) {
+  if (draggedoverRowIndex == successorIndex) {
     console.log(
-      `Row at index ${currentRowIndex} is the successor:\n\tIt's lower activation are disabled.`
+      `Row at index ${draggedoverRowIndex} is the successor:\n\tIt's lower activation are disabled.`
     );
   }
 
-  let rowLowerYThreshold = currentRow.offsetHeight / 4;
-  let rowUpperYThreshold = currentRow.offsetHeight - rowLowerYThreshold;
+  let rowLowerYThreshold = draggedoverRow.offsetHeight / 4;
+  let rowUpperYThreshold = draggedoverRow.offsetHeight - rowLowerYThreshold;
 
   // block placeholder positioning if dragging over the original dragged row
   if (
-    currentRowIndex + 1 != successorIndex ||
-    currentRowIndex - 1 != predecessorIndex
+    draggedoverRowIndex + 1 != successorIndex ||
+    draggedoverRowIndex - 1 != predecessorIndex
   ) {
     console.log('\tNot-dragged-row check passed.');
     console.log(
-      `\t{currentRowIndex + 1 != successorIndex}: ${
-        currentRowIndex + 1
+      `\t{draggedoverRowIndex + 1 != successorIndex}: ${
+        draggedoverRowIndex + 1
       } != ${successorIndex}`
     );
     console.log(
-      `\t{currentRowIndex - 1 != predecessorIndex}: ${
-        currentRowIndex - 1
+      `\t{draggedoverRowIndex- 1 != predecessorIndex}: ${
+        draggedoverRowIndex - 1
       } != ${predecessorIndex}`
     );
     // position placeholder row after the dragged over row
     if (
       pointerYPos >= rowUpperYThreshold &&
-      currentRowIndex != predecessorIndex
+      draggedoverRowIndex != predecessorIndex
     ) {
       console.log('\t\tUpper pointer position check passed.');
       console.log(
-        `\t\tIn the upper activation area of row at index ${currentRowIndex}:`
+        `\t\tIn the upper activation area of row at index ${draggedoverRowIndex}:`
       );
       console.log(
         `\t\t\t{cursorY >= rowUpperYThreshold}: ${pointerYPos} >= ${rowUpperYThreshold}`
       );
       console.log(
         `\t\tProposing to position placeholder at index ${
-          currentRowIndex + 1
+          draggedoverRowIndex + 1
         }...`
       );
-      let newPlaceholderSuccessorIndex = currentRowIndex + 2;
-      let newPlaceholderPredecessorIndex = currentRowIndex;
+      let newPlaceholderSuccessorIndex = draggedoverRowIndex + 2;
+      let newPlaceholderPredecessorIndex = draggedoverRowIndex;
       console.log('\t\tCurrent placeholder pair:');
       console.log(
         `\t\t\toldPlaceholderSuccessorIndex: ${oldPlaceholderSuccessorIndex}`
@@ -229,10 +229,10 @@ function handlePlaceholderPositioning(event) {
           }
         }
         console.log(
-          `\t\t\tPositioning placeholder at index ${currentRowIndex + 1}...`
+          `\t\t\tPositioning placeholder at index ${draggedoverRowIndex + 1}...`
         );
-        initPlaceholder(currentRowIndex + 1);
-        placeholderRowIndex = currentRowIndex + 1;
+        initPlaceholder(draggedoverRowIndex + 1);
+        placeholderRowIndex = draggedoverRowIndex + 1;
         oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
         oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
         placeholderExists = true;
@@ -240,20 +240,20 @@ function handlePlaceholderPositioning(event) {
       // position placeholder row before dragged over row
     } else if (
       pointerYPos <= rowLowerYThreshold &&
-      currentRowIndex != successorIndex
+      draggedoverRowIndex != successorIndex
     ) {
       console.log('\t\tLower pointer positioning check passed.');
       console.log(
-        `\t\tIn the lower activation area of row at index ${currentRowIndex}:`
+        `\t\tIn the lower activation area of row at index ${draggedoverRowIndex}:`
       );
       console.log(
         `\t\t\t{cursorY <= elementYThreshold}: ${pointerYPos} <= ${rowLowerYThreshold}`
       );
       console.log(
-        `\t\tProposing to position placeholder at index ${currentRowIndex}...`
+        `\t\tProposing to position placeholder at index ${draggedoverRowIndex}...`
       );
-      let newPlaceholderSuccessorIndex = currentRowIndex;
-      let newPlaceholderPredecessorIndex = currentRowIndex - 2;
+      let newPlaceholderSuccessorIndex = draggedoverRowIndex;
+      let newPlaceholderPredecessorIndex = draggedoverRowIndex - 2;
       console.log('\t\tCurrent placeholder pair:');
       console.log(
         `\t\t\toldPlaceholderSuccessorIndex: ${oldPlaceholderSuccessorIndex}`
@@ -296,10 +296,10 @@ function handlePlaceholderPositioning(event) {
           }
         }
         console.log(
-          `\t\t\tPositioning placeholder at index ${currentRowIndex}...`
+          `\t\t\tPositioning placeholder at index ${draggedoverRowIndex}...`
         );
-        initPlaceholder(currentRowIndex);
-        placeholderRowIndex = currentRowIndex;
+        initPlaceholder(draggedoverRowIndex);
+        placeholderRowIndex = draggedoverRowIndex;
         oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
         oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
         placeholderExists = true;
