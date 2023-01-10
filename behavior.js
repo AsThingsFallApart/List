@@ -2,7 +2,7 @@ const crimson = 'rgb(220, 20, 60)';
 const forestgreen = 'rgb(34, 139, 34)';
 
 let defaultColor = crimson;
-let placeholderExists = false;
+let placeholderInList = false;
 let placeholderRowIndex = undefined;
 let oldPlaceholderPredecessorIndex = 0;
 let oldPlaceholderSuccessorIndex = 0;
@@ -48,7 +48,7 @@ function preventDefaultBehavior(event) {
   event.preventDefault();
 }
 
-function initPlaceholder(insertionIndex) {
+function insertPlaceholder(insertionIndex) {
   let listBody = document.getElementsByClassName('listBody')[0];
   let newListRowPlaceholder;
 
@@ -100,7 +100,6 @@ function initPlaceholder(insertionIndex) {
 
 function handlePlaceholderPositioning(event) {
   event.preventDefault();
-  // console.log(`The cursor is at ${event.offsetX}, ${event.offsetY}.`);
   let pointerYPos = event.offsetY;
   let listBody = document.getElementsByClassName('listBody')[0];
   let draggedRow = document.getElementById('dragged');
@@ -115,89 +114,101 @@ function handlePlaceholderPositioning(event) {
   );
   let predecessorIndex = draggedRowIndex - 1;
   let successorIndex = draggedRowIndex + 1;
-
-  console.log(`\nThis list has ${listBody.childElementCount} rows:`);
-
-  let listRows = listBody.rows;
-  console.log('\t-----------------');
-  for (let i = 0; i < listBody.childElementCount; i++) {
-    if (listRows[i].classList == 'listRowPlaceholder') {
-      console.log(`${i}:\t|\tplaceholder\t|`);
-    } else {
-      console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
-    }
-  }
-  console.log('\t-----------------');
-
-  console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
-  console.log(`draggedoverRowIndex: ${draggedoverRowIndex}`);
-  console.log(`draggedRowIndex: ${draggedRowIndex}`);
-  console.log(`predecessorIndex: ${predecessorIndex}`);
-  console.log(`successorIndex: ${successorIndex}`);
-
-  if (draggedoverRowIndex == predecessorIndex) {
-    console.log(
-      `Row at index ${draggedoverRowIndex} is the predecessor:\n\tIt's upper activation area is disabled.`
-    );
-  }
-
-  if (draggedoverRowIndex == successorIndex) {
-    console.log(
-      `Row at index ${draggedoverRowIndex} is the successor:\n\tIt's lower activation are disabled.`
-    );
-  }
-
   let rowLowerYThreshold = draggedoverRow.offsetHeight / 4;
   let rowUpperYThreshold = draggedoverRow.offsetHeight - rowLowerYThreshold;
+  let draggedOverRowisOriginalDraggedRow =
+    draggedoverRowIndex + 1 == successorIndex &&
+    draggedoverRowIndex - 1 == predecessorIndex;
 
   // block placeholder positioning if dragging over the original dragged row
-  if (
-    draggedoverRowIndex + 1 != successorIndex ||
-    draggedoverRowIndex - 1 != predecessorIndex
-  ) {
-    console.log('\tNot-dragged-row check passed.');
+  console.log(
+    `\nRow before dragged over row is predecessor: ${
+      draggedoverRowIndex - 1 == predecessorIndex
+    }`
+  );
+  console.log(
+    `Row after dragged over row is successor: ${
+      draggedoverRowIndex + 1 == successorIndex
+    }`
+  );
+
+  if (!draggedOverRowisOriginalDraggedRow) {
     console.log(
-      `\t{draggedoverRowIndex + 1 != successorIndex}: ${
-        draggedoverRowIndex + 1
-      } != ${successorIndex}`
+      'Dragged over row is not in between predecessor and successor.\n\tNot-dragged-row check passed.'
+    );
+    console.log(`This list has ${listBody.childElementCount} rows:`);
+
+    let listRows = listBody.rows;
+    console.log('\t-----------------');
+    for (let i = 0; i < listBody.childElementCount; i++) {
+      if (listRows[i].classList == 'listRowPlaceholder') {
+        console.log(`${i}:\t|\tplaceholder\t|`);
+      } else {
+        console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
+      }
+    }
+    console.log('\t-----------------');
+
+    console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
+    console.log(`draggedoverRowIndex: ${draggedoverRowIndex}`);
+    console.log(`draggedRowIndex: ${draggedRowIndex}`);
+    console.log(`\tpredecessorIndex: ${predecessorIndex}`);
+    console.log(`\tsuccessorIndex: ${successorIndex}`);
+
+    if (draggedoverRowIndex == predecessorIndex) {
+      console.log(
+        `draggedoverRow is the predecessor:\n\tIt's upper activation area is disabled.`
+      );
+    }
+
+    if (draggedoverRowIndex == successorIndex) {
+      console.log(
+        `draggedoverRow is the successor:\n\tIt's lower activation is disabled.`
+      );
+    }
+    console.log(
+      'Checking to see if cursor is in an activation area AND\n\tthe dragged over row is not a predecessor or successor...'
     );
     console.log(
-      `\t{draggedoverRowIndex- 1 != predecessorIndex}: ${
-        draggedoverRowIndex - 1
-      } != ${predecessorIndex}`
+      `\t{cursorY <= rowLowerYThreshold}: ${pointerYPos <= rowLowerYThreshold}`
+    );
+    console.log(
+      `\t{draggedoverRowIndex != successorIndex}: ${draggedoverRowIndex} != ${successorIndex} (${
+        draggedRowIndex != successorIndex
+      })`
+    );
+    console.log(
+      `\t{cursorY >= rowUpperYThreshold}: ${pointerYPos >= rowUpperYThreshold}`
+    );
+    console.log(
+      `\t{draggedoverRowIndex != predecessorIndex}: ${draggedoverRowIndex} != ${predecessorIndex} (${
+        draggedoverRowIndex != predecessorIndex
+      })`
     );
     // position placeholder row after the dragged over row
     if (
       pointerYPos >= rowUpperYThreshold &&
       draggedoverRowIndex != predecessorIndex
     ) {
-      console.log('\t\tUpper pointer position check passed.');
+      console.log('\t\tUpper activation area check passed.');
       console.log(
-        `\t\tIn the upper activation area of row at index ${draggedoverRowIndex}:`
+        `\t\tProposing to position placeholder at index ${draggedoverRowIndex}...`
       );
-      console.log(
-        `\t\t\t{cursorY >= rowUpperYThreshold}: ${pointerYPos} >= ${rowUpperYThreshold}`
-      );
-      console.log(
-        `\t\tProposing to position placeholder at index ${
-          draggedoverRowIndex + 1
-        }...`
-      );
-      let newPlaceholderSuccessorIndex = draggedoverRowIndex + 2;
-      let newPlaceholderPredecessorIndex = draggedoverRowIndex;
+      let newPlaceholderPredecessorIndex = draggedoverRowIndex - 1;
+      let newPlaceholderSuccessorIndex = draggedoverRowIndex + 1;
       console.log('\t\tCurrent placeholder pair:');
+      console.log(
+        `\t\t\toldPlaceholderPredecessorIndex: ${oldPlaceholderPredecessorIndex}`
+      );
       console.log(
         `\t\t\toldPlaceholderSuccessorIndex: ${oldPlaceholderSuccessorIndex}`
       );
-      console.log(
-        `\t\t\toldPlaceholderTopNeightborIndex: ${oldPlaceholderPredecessorIndex}`
-      );
       console.log('\t\tProposed placeholder pair:');
       console.log(
-        `\t\t\tnewPlaceholderSuccessorIndex: ${newPlaceholderSuccessorIndex}`
+        `\t\t\tnewPlaceholderPredecessorIndex: ${newPlaceholderPredecessorIndex}`
       );
       console.log(
-        `\t\t\tnewPlaceholderPredecessorIndex: ${newPlaceholderPredecessorIndex}`
+        `\t\t\tnewPlaceholderSuccessorIndex: ${newPlaceholderSuccessorIndex}`
       );
 
       if (
@@ -207,7 +218,7 @@ function handlePlaceholderPositioning(event) {
         console.log('\t\t\tNew placeholder node pair check passed.');
         /* Delete existing placeholder row before inserting a new one */
         //  Consider encapsulating this conceptually unique functionality into a seperate function...
-        if (placeholderRowIndex != undefined) {
+        if (placeholderInList) {
           console.log('\t\t\t\tDeleting old placeholder:');
           console.log(
             `\t\t\t\t\tNumber of available rows: ${listBody.childElementCount}`
@@ -227,46 +238,62 @@ function handlePlaceholderPositioning(event) {
             );
             listBody.deleteRow(placeholderRowIndex);
           }
+
+          let listRows = listBody.rows;
+          console.log('\t-----------------');
+          for (let i = 0; i < listBody.childElementCount; i++) {
+            if (listRows[i].classList == 'listRowPlaceholder') {
+              console.log(`${i}:\t|\tplaceholder\t|`);
+            } else {
+              console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
+            }
+          }
+          console.log('\t-----------------');
         }
         console.log(
           `\t\t\tPositioning placeholder at index ${draggedoverRowIndex + 1}...`
         );
-        initPlaceholder(draggedoverRowIndex + 1);
+        insertPlaceholder(draggedoverRowIndex + 1);
         placeholderRowIndex = draggedoverRowIndex + 1;
         oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
         oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
-        placeholderExists = true;
+        placeholderInList = true;
+
+        let listRows = listBody.rows;
+        console.log('\t-----------------');
+        for (let i = 0; i < listBody.childElementCount; i++) {
+          if (listRows[i].classList == 'listRowPlaceholder') {
+            console.log(`${i}:\t|\tplaceholder\t|`);
+          } else {
+            console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
+          }
+        }
+        console.log('\t-----------------');
       }
       // position placeholder row before dragged over row
     } else if (
       pointerYPos <= rowLowerYThreshold &&
       draggedoverRowIndex != successorIndex
     ) {
-      console.log('\t\tLower pointer positioning check passed.');
-      console.log(
-        `\t\tIn the lower activation area of row at index ${draggedoverRowIndex}:`
-      );
-      console.log(
-        `\t\t\t{cursorY <= elementYThreshold}: ${pointerYPos} <= ${rowLowerYThreshold}`
-      );
+      console.log('\t\tLower activation area check passed.');
       console.log(
         `\t\tProposing to position placeholder at index ${draggedoverRowIndex}...`
       );
-      let newPlaceholderSuccessorIndex = draggedoverRowIndex;
-      let newPlaceholderPredecessorIndex = draggedoverRowIndex - 2;
+      let newPlaceholderPredecessorIndex = draggedoverRowIndex - 1;
+      let newPlaceholderSuccessorIndex = draggedoverRowIndex + 1;
       console.log('\t\tCurrent placeholder pair:');
-      console.log(
-        `\t\t\toldPlaceholderSuccessorIndex: ${oldPlaceholderSuccessorIndex}`
-      );
       console.log(
         `\t\t\toldPlaceholderPredecessorIndex: ${oldPlaceholderPredecessorIndex}`
       );
+      console.log(
+        `\t\t\toldPlaceholderSuccessorIndex: ${oldPlaceholderSuccessorIndex}`
+      );
       console.log('\t\tProposed placeholder pair:');
       console.log(
-        `\t\t\tnewPlaceholderSuccessorIndex: ${newPlaceholderSuccessorIndex}`
+        `\t\t\tnewPlaceholderPredecessorIndex: ${newPlaceholderPredecessorIndex}`
       );
       console.log(
-        `\t\t\tnewPlaceholderPredecessorIndex: ${newPlaceholderPredecessorIndex}`
+        `\t\t\tnewPlaceholderSuccessorIndex: ${newPlaceholderSuccessorIndex}`
       );
 
       if (
@@ -274,7 +301,7 @@ function handlePlaceholderPositioning(event) {
         newPlaceholderPredecessorIndex != oldPlaceholderPredecessorIndex
       ) {
         console.log('\t\t\tNew placeholder node pair check passed.');
-        if (placeholderRowIndex != undefined) {
+        if (placeholderInList) {
           console.log(`\t\t\t\tDeleting old placeholder:`);
           console.log(
             `\t\t\t\t\tNumber of available rows: ${listBody.childElementCount}`
@@ -294,15 +321,41 @@ function handlePlaceholderPositioning(event) {
             );
             listBody.deleteRow(placeholderRowIndex);
           }
+
+          let listRows = listBody.rows;
+          console.log('\t-----------------');
+          for (let i = 0; i < listBody.childElementCount; i++) {
+            if (listRows[i].classList == 'listRowPlaceholder') {
+              console.log(`${i}:\t|\tplaceholder\t|`);
+            } else {
+              console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
+            }
+          }
+          console.log('\t-----------------');
+
+          // decrement insertion index since deleting a row before the insertion index
+          // shifts all rows back one
+          draggedoverRowIndex--;
         }
         console.log(
           `\t\t\tPositioning placeholder at index ${draggedoverRowIndex}...`
         );
-        initPlaceholder(draggedoverRowIndex);
+        insertPlaceholder(draggedoverRowIndex);
         placeholderRowIndex = draggedoverRowIndex;
         oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
         oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
-        placeholderExists = true;
+        placeholderInList = true;
+
+        let listRows = listBody.rows;
+        console.log('\t-----------------');
+        for (let i = 0; i < listBody.childElementCount; i++) {
+          if (listRows[i].classList == 'listRowPlaceholder') {
+            console.log(`${i}:\t|\tplaceholder\t|`);
+          } else {
+            console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
+          }
+        }
+        console.log('\t-----------------');
       }
     }
   }
@@ -314,7 +367,7 @@ function handleClick(event) {
   console.log(`ID of ${clickedRow}: ${clickedRow.id}`);
   console.log(`Content of ${clickedRow}: ${clickedRow.textContent}`);
   console.dir(clickedRow);
-  console.log(`placeholderExists: ${placeholderExists}`);
+  console.log(`placeholderInList: ${placeholderInList}`);
 }
 
 function handleDrop(event) {
@@ -328,12 +381,12 @@ function handleDrop(event) {
       'application/x-moz-node'
     )}`
   );
-  console.log(`boolean 'placeholderExists': ${placeholderExists}`);
+  console.log(`boolean 'placeholderInList': ${placeholderInList}`);
 
   console.log('The event:');
   console.log(event);
 
-  if (placeholderExists) {
+  if (placeholderInList) {
     let listBody = document.getElementsByClassName('listBody')[0];
     let newListRow;
 
@@ -380,9 +433,9 @@ function handleDrop(event) {
   draggedRow.id = '';
 
   placeholderRowIndex = undefined;
-  placeholderExists = false;
+  placeholderInList = false;
 
-  console.log(`placeholderExists: ${placeholderExists}`);
+  console.log(`placeholderInList: ${placeholderInList}`);
   console.log(`placeholderRowIndex: ${placeholderRowIndex}`);
 }
 
