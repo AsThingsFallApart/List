@@ -44,13 +44,28 @@ handleRowCreation(5);
 //   }
 // }
 
+function printList() {
+  let listBody = document.getElementsByClassName('listBody')[0];
+  let listRows = listBody.rows;
+
+  console.log('\t-----------------');
+  for (let i = 0; i < listBody.childElementCount; i++) {
+    if (listRows[i].classList == 'listRowPlaceholder') {
+      console.log(`${i}:\t|\tplaceholder\t|`);
+    } else {
+      console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
+    }
+  }
+  console.log('\t-----------------');
+}
+
 function preventDefaultBehavior(event) {
   event.preventDefault();
 }
 
 function insertPlaceholder(insertionIndex) {
   let listBody = document.getElementsByClassName('listBody')[0];
-  let newListRowPlaceholder;
+  let copiedListRowPlaceholder;
 
   let listRowIndicatorPlaceholder = document.createElement('td');
   listRowIndicatorPlaceholder.classList = 'listRowIndicatorPlaceholder';
@@ -58,21 +73,20 @@ function insertPlaceholder(insertionIndex) {
   let listRowDescriptorPlaceholder = document.createElement('td');
   listRowDescriptorPlaceholder.classList = 'listRowDescriptorPlaceholder';
 
-  newListRowPlaceholder = listBody.insertRow(insertionIndex);
-  newListRowPlaceholder.classList = 'listRowPlaceholder';
-  newListRowPlaceholder.appendChild(listRowIndicatorPlaceholder);
-  newListRowPlaceholder.appendChild(listRowDescriptorPlaceholder);
+  copiedListRowPlaceholder = listBody.insertRow(insertionIndex);
+  copiedListRowPlaceholder.classList = 'listRowPlaceholder';
+  copiedListRowPlaceholder.appendChild(listRowIndicatorPlaceholder);
+  copiedListRowPlaceholder.appendChild(listRowDescriptorPlaceholder);
 
-  newListRowPlaceholder.addEventListener('dragover', (event) => {
+  copiedListRowPlaceholder.addEventListener('dragover', (event) => {
     event.preventDefault();
     console.log('Cursor is over the placeholder.');
     event.dataTransfer.dropEffect = 'move';
   });
-  newListRowPlaceholder.addEventListener('dragenter', (event) => {
+  copiedListRowPlaceholder.addEventListener('dragenter', (event) => {
     event.preventDefault();
     console.log('Cursor has entered the placeholder area');
   });
-  newListRowPlaceholder.addEventListener('drop', handleDrop);
 }
 
 /* ROW SEMANTICS:
@@ -129,17 +143,7 @@ function handlePlaceholderPositioning(event) {
       'Dragged over row is not in between predecessor and successor.\n\tNot-dragged-row check passed.'
     );
     console.log(`This list has ${listBody.childElementCount} rows:`);
-
-    let listRows = listBody.rows;
-    console.log('\t-----------------');
-    for (let i = 0; i < listBody.childElementCount; i++) {
-      if (listRows[i].classList == 'listRowPlaceholder') {
-        console.log(`${i}:\t|\tplaceholder\t|`);
-      } else {
-        console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
-      }
-    }
-    console.log('\t-----------------');
+    printList();
 
     console.log(`oldPlaceholderRowIndex:\t${oldPlaceholderRowIndex}`);
     console.log(`draggedoverRowIndex:\t${draggedoverRowIndex}`);
@@ -238,17 +242,7 @@ function handlePlaceholderPositioning(event) {
         oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
         oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
 
-        let listRows = listBody.rows;
-        console.log('\t-----------------');
-        for (let i = 0; i < listBody.childElementCount; i++) {
-          if (listRows[i].classList == 'listRowPlaceholder') {
-            console.log(`${i}:\t|\tplaceholder\t|`);
-          } else {
-            console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
-          }
-        }
-        console.log('\t-----------------');
-
+        printList();
         console.log('\t\t\t\tInsertion successful.');
         console.log(
           `\t\t\t\tChecking if old placeholder exists...\n\t\t\t\t\toldPlaceholderRowIndex:\t${oldPlaceholderRowIndex}\n\t\t\t\t\tnewPlaceholderRowIndex:\t${newPlaceholderRowIndex}`
@@ -274,16 +268,7 @@ function handlePlaceholderPositioning(event) {
           );
           listBody.deleteRow(oldPlaceholderRowIndex);
 
-          let listRows = listBody.rows;
-          console.log('\t-----------------');
-          for (let i = 0; i < listBody.childElementCount; i++) {
-            if (listRows[i].classList == 'listRowPlaceholder') {
-              console.log(`${i}:\t|\tplaceholder\t|`);
-            } else {
-              console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
-            }
-          }
-          console.log('\t-----------------');
+          printList();
         }
 
         // state: old placeholder in list and new placeholder is positioned later in the list
@@ -346,17 +331,7 @@ function handlePlaceholderPositioning(event) {
         oldPlaceholderPredecessorIndex = newPlaceholderPredecessorIndex;
         oldPlaceholderSuccessorIndex = newPlaceholderSuccessorIndex;
 
-        let listRows = listBody.rows;
-        console.log('\t-----------------');
-        for (let i = 0; i < listBody.childElementCount; i++) {
-          if (listRows[i].classList == 'listRowPlaceholder') {
-            console.log(`${i}:\t|\tplaceholder\t|`);
-          } else {
-            console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
-          }
-        }
-        console.log('\t-----------------');
-
+        printList();
         console.log('\t\t\t\tInsertion successful.');
         console.log(
           `\t\t\t\tChecking if old placeholder exists...\n\t\t\t\t\toldPlaceholderRowIndex:\t${oldPlaceholderRowIndex}\n\t\t\t\t\tnewPlaceholderRowIndex:\t${newPlaceholderRowIndex}`
@@ -374,16 +349,7 @@ function handlePlaceholderPositioning(event) {
           );
           listBody.deleteRow(oldPlaceholderRowIndex);
 
-          let listRows = listBody.rows;
-          console.log('\t-----------------');
-          for (let i = 0; i < listBody.childElementCount; i++) {
-            if (listRows[i].classList == 'listRowPlaceholder') {
-              console.log(`${i}:\t|\tplaceholder\t|`);
-            } else {
-              console.log(`${i}:\t|\t${listRows[i].textContent}\t\t\t|`);
-            }
-          }
-          console.log('\t-----------------');
+          printList();
         }
 
         // state: old placeholder exists and new placeholder was placed further in the list
@@ -413,10 +379,13 @@ function handleClick(event) {
   console.dir(clickedRow);
 }
 
+/* handleDrop: on drop event, replace placeholder row with dragged row. */
 function handleDrop(event) {
   event.preventDefault();
+  let draggedRow = document.getElementById('dragged');
 
-  console.log('dropped');
+  console.log('\ndropped');
+  console.log(`event.target: ${event.target}`);
   console.log(`event.target.classList: ${event.target.classList}`);
   console.log(
     `event.dataTransfer.data: ${event.dataTransfer.getData(
@@ -428,31 +397,45 @@ function handleDrop(event) {
   console.log(event);
 
   if (newPlaceholderRowIndex != undefined) {
-    let draggedRow = document.getElementById('dragged');
+    //  1. delete the dragged row
+    //  2. delete the placeholder row
+    //  3. insert the copied row at the index of the placeholder row
     let listBody = document.getElementsByClassName('listBody')[0];
-    let newListRow;
 
-    let draggedRowInnerHTML = event.dataTransfer.getData(
-      'application/x-moz-node'
-    );
-    console.log(`draggedRowInnerHTML: ${draggedRowInnerHTML}`);
-
+    //  1.
     let draggedRowIndex = Array.prototype.indexOf.call(
       listBody.childNodes,
       draggedRow
     );
     console.log(`draggedRowIndex: ${draggedRowIndex}`);
 
-    newListRow.innerHTML = draggedRowInnerHTML;
-    newListRow.classList = 'listRow';
-    newListRow.addEventListener('dragover', handlePlaceholderPositioning);
-    addBehaviorToRowChildren(newListRow);
+    listBody.deleteRow(draggedRowIndex);
+
+    //  2.
+    // state: deletion operation on dragged row shifts placeholder index back one
+    if (draggedRowIndex < oldPlaceholderRowIndex) {
+      oldPlaceholderRowIndex == --oldPlaceholderRowIndex;
+    }
+
+    listBody.deleteRow(oldPlaceholderRowIndex);
+
+    //  3.
+    let copiedListRow = listBody.insertRow(oldPlaceholderRowIndex);
+    let draggedRowInnerHTML = event.dataTransfer.getData(
+      'application/x-moz-node'
+    );
+    console.log(`draggedRowInnerHTML: ${draggedRowInnerHTML}`);
+
+    copiedListRow.innerHTML = draggedRowInnerHTML;
+    copiedListRow.classList = 'listRow';
+    copiedListRow.addEventListener('dragover', handlePlaceholderPositioning);
+    addBehaviorToRowChildren(copiedListRow);
   }
 
   draggedRow.id = '';
 
-  oldPlaceholderRowIndex = -2;
-  newPlaceholderRowIndex = -2;
+  oldPlaceholderRowIndex = undefined;
+  newPlaceholderRowIndex = undefined;
 
   console.log(
     `oldPlaceholderRowIndex:\t${oldPlaceholderRowIndex}\nnewPlaceholderRowIndex:\t${newPlaceholderRowIndex}`
@@ -542,13 +525,16 @@ function handleRowDeletion(event) {
 
 function substituteBackOnBlur(event) {
   if (event.target.value != '') {
-    let newListRowDescriptor = document.createElement('td');
-    newListRowDescriptor.classList = 'listRowDescriptor';
-    newListRowDescriptor.textContent = event.target.value;
-    newListRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
+    let copiedListRowDescriptor = document.createElement('td');
+    copiedListRowDescriptor.classList = 'listRowDescriptor';
+    copiedListRowDescriptor.textContent = event.target.value;
+    copiedListRowDescriptor.addEventListener(
+      'dblclick',
+      handleTextSubstitution
+    );
 
     let parentListRow = event.target.parentNode;
-    parentListRow.replaceChild(newListRowDescriptor, event.target);
+    parentListRow.replaceChild(copiedListRowDescriptor, event.target);
   }
 }
 
@@ -556,25 +542,31 @@ function substituteBackOnKeydown(event) {
   let inputSubtitutorValue = event.target.value;
 
   if (event.key == 'Enter' && inputSubtitutorValue != '') {
-    let newListRowDescriptor = document.createElement('td');
-    newListRowDescriptor.classList = 'listRowDescriptor';
-    newListRowDescriptor.textContent = event.target.value;
-    newListRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
+    let copiedListRowDescriptor = document.createElement('td');
+    copiedListRowDescriptor.classList = 'listRowDescriptor';
+    copiedListRowDescriptor.textContent = event.target.value;
+    copiedListRowDescriptor.addEventListener(
+      'dblclick',
+      handleTextSubstitution
+    );
 
     event.target.removeEventListener('blur', substituteBackOnBlur);
 
     let parentListRow = event.target.parentNode;
-    parentListRow.replaceChild(newListRowDescriptor, event.target);
+    parentListRow.replaceChild(copiedListRowDescriptor, event.target);
   } else if (event.key == 'Escape' && inputSubtitutorValue != '') {
-    let newListRowDescriptor = document.createElement('td');
-    newListRowDescriptor.classList = 'listRowDescriptor';
-    newListRowDescriptor.textContent = event.target.value;
-    newListRowDescriptor.addEventListener('dblclick', handleTextSubstitution);
+    let copiedListRowDescriptor = document.createElement('td');
+    copiedListRowDescriptor.classList = 'listRowDescriptor';
+    copiedListRowDescriptor.textContent = event.target.value;
+    copiedListRowDescriptor.addEventListener(
+      'dblclick',
+      handleTextSubstitution
+    );
 
     event.target.removeEventListener('blur', substituteBackOnBlur);
 
     let parentListRow = event.target.parentNode;
-    parentListRow.replaceChild(newListRowDescriptor, event.target);
+    parentListRow.replaceChild(copiedListRowDescriptor, event.target);
   }
 }
 
@@ -620,7 +612,7 @@ function initList() {
   return newList;
 }
 
-function initListRow(newListRow, rowContent = '') {
+function initListRow(copiedListRow, rowContent = '') {
   let listRowIndicator = document.createElement('td');
   listRowIndicator.classList.add('listRowIndicator');
   listRowIndicator.style.backgroundColor = defaultColor;
@@ -636,13 +628,13 @@ function initListRow(newListRow, rowContent = '') {
   let listRowControl = document.createElement('td');
   listRowControl.classList = 'listRowControl';
 
-  newListRow.classList.add('listRow');
-  newListRow.appendChild(listRowIndicator);
-  newListRow.appendChild(listRowDescriptor);
-  newListRow.addEventListener('click', handleClick);
-  newListRow.addEventListener('dragover', handlePlaceholderPositioning);
+  copiedListRow.classList.add('listRow');
+  copiedListRow.appendChild(listRowIndicator);
+  copiedListRow.appendChild(listRowDescriptor);
+  copiedListRow.addEventListener('click', handleClick);
+  copiedListRow.addEventListener('dragover', handlePlaceholderPositioning);
 
-  addBehaviorToRowChildren(newListRow);
+  addBehaviorToRowChildren(copiedListRow);
 }
 
 function handleRowCreation(rowContent = '') {
@@ -657,11 +649,11 @@ function handleRowCreation(rowContent = '') {
     list = document.getElementById('list');
   }
 
-  let newListRow = list.insertRow(-1);
+  let copiedListRow = list.insertRow(-1);
 
   if (rowContent != '') {
-    initListRow(newListRow, rowContent);
+    initListRow(copiedListRow, rowContent);
   } else {
-    initListRow(newListRow);
+    initListRow(copiedListRow);
   }
 }
