@@ -120,7 +120,9 @@ function handlePlaceholderPositioning(event) {
   );
   let predecessorIndex = draggedRowIndex - 1;
   let successorIndex = draggedRowIndex + 1;
-  let rowLowerYThreshold = draggedoverRow.offsetHeight / 4;
+  let activtionAreaPercentage = 0.33;
+  let rowLowerYThreshold =
+    draggedoverRow.offsetHeight * activtionAreaPercentage;
   let rowUpperYThreshold = draggedoverRow.offsetHeight - rowLowerYThreshold;
   let draggedOverRowisOriginalDraggedRow =
     draggedoverRowIndex + 1 == successorIndex &&
