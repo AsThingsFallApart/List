@@ -614,7 +614,7 @@ function initList() {
   return newList;
 }
 
-function initListRow(copiedListRow, rowContent = '') {
+function initListRow(newListRow, rowContent = '') {
   let listRowIndicator = document.createElement('td');
   listRowIndicator.classList.add('listRowIndicator');
   listRowIndicator.style.backgroundColor = defaultColor;
@@ -622,21 +622,26 @@ function initListRow(copiedListRow, rowContent = '') {
   let listRowDescriptor = document.createElement('td');
   listRowDescriptor.classList.add('listRowDescriptor');
   if (rowContent != '') {
+    // console.log(
+    //   `Initializing descriptor element with hardcoded value "${rowContent}".`
+    // );
     listRowDescriptor.textContent = rowContent;
   } else {
+    // console.log(
+    //   `Optional parameter 'rowContent' uninitialized. Using textbox value: ${
+    //     document.getElementById('inputBox').value
+    //   }`
+    // );
     listRowDescriptor.textContent = document.getElementById('inputBox').value;
   }
 
-  let listRowControl = document.createElement('td');
-  listRowControl.classList = 'listRowControl';
+  newListRow.classList.add('listRow');
+  newListRow.appendChild(listRowIndicator);
+  newListRow.appendChild(listRowDescriptor);
+  newListRow.addEventListener('click', handleClick);
+  newListRow.addEventListener('dragover', handlePlaceholderPositioning);
 
-  copiedListRow.classList.add('listRow');
-  copiedListRow.appendChild(listRowIndicator);
-  copiedListRow.appendChild(listRowDescriptor);
-  copiedListRow.addEventListener('click', handleClick);
-  copiedListRow.addEventListener('dragover', handlePlaceholderPositioning);
-
-  addBehaviorToRowChildren(copiedListRow);
+  addBehaviorToRowChildren(newListRow);
 }
 
 function handleRowCreation(rowContent = '') {
@@ -651,11 +656,14 @@ function handleRowCreation(rowContent = '') {
     list = document.getElementById('list');
   }
 
-  let copiedListRow = list.insertRow(-1);
+  let newListRow = list.insertRow(-1);
 
-  if (rowContent != '') {
-    initListRow(copiedListRow, rowContent);
+  // console.log(typeof rowContent);
+  if (typeof rowContent != 'object') {
+    // console.log(rowContent);
+    initListRow(newListRow, rowContent);
   } else {
-    initListRow(copiedListRow);
+    // console.log(rowContent);
+    initListRow(newListRow);
   }
 }
