@@ -1,7 +1,8 @@
 const crimson = 'rgb(220, 20, 60)';
 const forestgreen = 'rgb(34, 139, 34)';
+const verylightgrey = 'rgb(99, 99, 102)';
 
-let defaultColor = crimson;
+let defaultColor = verylightgrey;
 let oldPlaceholderRowIndex = undefined;
 let newPlaceholderRowIndex = undefined;
 let oldPlaceholderPredecessorIndex = 0;
@@ -94,9 +95,9 @@ function insertPlaceholder(insertionIndex) {
  * minYOffset
  *  |
  *  | ------------------------------------
- *  | |                                  | <-- "lower activation area" (lower 25% offsetY values)
+ *  | |                                  | <-- "lower activation area" (lower 33% offsetY values)
  *  | |       {col1, col2.. coln}        | <-- "middle"                (deadzone, no behavior)
- *  | |                                  | <-- "upper activation area" (upper 25% offsetY values)
+ *  | |                                  | <-- "upper activation area" (upper 33% offsetY values)
  *  | ------------------------------------
  *  |
  *  V
@@ -345,6 +346,12 @@ function handlePlaceholderPositioning(event) {
           newPlaceholderRowIndex != oldPlaceholderRowIndex &&
           oldPlaceholderRowIndex != undefined
         ) {
+          // state: old placeholder exists and new placeholder was placed before in the list,
+          //        shifting the old placeholder's index up one
+          if (newPlaceholderRowIndex < oldPlaceholderRowIndex) {
+            oldPlaceholderRowIndex == ++oldPlaceholderRowIndex;
+          }
+
           console.log('\t\t\t\tDeleting old placeholder:');
           console.log(
             `\t\t\t\t\tDeleting row at index ${oldPlaceholderRowIndex}.`
@@ -581,10 +588,10 @@ function createRowOnKeydown(event) {
 function handleIndicatorClick(event) {
   let listRowIndicator = event.target;
 
-  if (listRowIndicator.style.backgroundColor == crimson) {
+  if (listRowIndicator.style.backgroundColor == defaultColor) {
     listRowIndicator.style.backgroundColor = forestgreen;
   } else if (listRowIndicator.style.backgroundColor == forestgreen) {
-    listRowIndicator.style.backgroundColor = crimson;
+    listRowIndicator.style.backgroundColor = defaultColor;
   }
 }
 
